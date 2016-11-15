@@ -1,7 +1,7 @@
 var debug = require('debug')('hlkz:server');
 var http = require('http');
 
-var port = normalizePort(process.env.PORT || '80');
+var port = normalizePort(process.env.PORT || '3000');
 
 export default (app) => {
   // Get port from environment and store in Express
