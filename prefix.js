@@ -25,6 +25,7 @@ export default (req, res, next) => {
 
     switch(prefix) {
       case '':
+      case 'www':
       case 'fr':
         locale.setLocale('fr')
         break
