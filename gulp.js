@@ -49,7 +49,7 @@ let app_babelrc = {
 
 gulp.task('build-corejs', () => {
   pump([
-    gulp.src('core/script/*.js'),
+    gulp.src(CorePath+'/njb/script/*.js'),
     babel(script_babelrc),
     buffer(),
     uglify().on('error', common.error),
