@@ -1,6 +1,7 @@
 import express from 'express'
 import File from './file'
 import Process from './process'
+import { LibPath } from './path'
 
 let env = process.env.NODE_ENV
 
@@ -14,7 +15,7 @@ export default (app) => {
     pages = rows
     pages.forEach(page => {
       if (page['path'] !== '') {
-        let jsPath = __dirname+'/site/page/'+page['path']+'.js'
+        let jsPath = LibPath+'/site/page/'+page['path']+'.js'
         if (File.exists(jsPath)) {
           let js = require(jsPath)
           page['js'] = js
