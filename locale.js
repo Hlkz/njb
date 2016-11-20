@@ -24,8 +24,9 @@ let Locale = {}
 // Public
 //
 
-Locale.load = function (db) {
+Locale.load = function (db, allowPageContentOnly = true) {
   this.db = db
+  this.allowPageContentOnly = allowPageContentOnly
 }
 
 Locale.setLocale = function(locale) {
@@ -88,6 +89,7 @@ Locale.loadPage_t = function(name) {
     let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
     this.db.query(query, function(err, rows, fields) {
       if (err) reject(err);
+      if (rows)
       rows.forEach(row => {
         let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
         this._t[_page] = this._t[_page] || {}
@@ -106,6 +108,7 @@ Locale.loadPage_txt = function(name) {
     let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
     this.db.query(query, function(err, rows, fields) {
       if (err) reject(err);
+      if (rows)
       rows.forEach(row => {
         let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
         this._txt[_page] = this._txt[_page] || {}
@@ -147,12 +150,13 @@ Locale.loadPage_pug = function(name) {
     this.db.query(query, function(err, rows, fields) {
       if (err) reject(err);
         var promises = []
+      if (rows)
       rows.forEach(row => {
         let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
         this._pug[_page] = this._pug[_page] || {}
         this._pug[_page][_name] = this._pug[_page][_name] || {}
-    this._pug[_page][_name]['fr'] = null
-    this._pug[_page][_name]['en'] = null
+        this._pug[_page][_name]['fr'] = null
+        this._pug[_page][_name]['en'] = null
         promises.push(this.loadPugLocale(row['fr'], this._pug[_page][_name], 'fr', _page))
         promises.push(this.loadPugLocale(row['en'], this._pug[_page][_name], 'en', _page))
       })
@@ -210,7 +214,7 @@ Locale.pug = function (str, self = null) {
 }
 
 //
-// Specific to Hlkz/nodejs-base
+// Specific for site-lps
 //
 
 Locale.getPageLink = function(name, title = null, self = null) {
@@ -223,7 +227,11 @@ Locale.getPageLink = function(name, title = null, self = null) {
       title = this.t('menu-'+name, self)
     if (!title)
       title = this.t('title-'+name, self)
-    return pug.render('a.loadpage(href=\''+pagePath+'\', page-path=\''+pagePath+'\') '+title)
+
+    if (this.allowPageContentOnly)
+      return pug.render('a.loadpage(href=\''+pagePath+'\', page-path=\''+pagePath+'\') '+title)
+    else
+      return pug.render('a(href=\''+pagePath+'\') '+title)
   }
   return ''
 }
@@ -243,7 +251,8 @@ Locale._pug = {}
 Locale.loaded = []
 Locale.fullLoaded = false
 Locale.db = null
-Locale.pages_by_name
+Locale.pages_by_name = []
+Locale.allowPageContentOnly = true
 /* Instance members */
 //locale.locale // 'fr' or 'en'
 //locale.loc = _loc[locale]
