@@ -1,7 +1,9 @@
 var debug = require('debug')('hlkz:server');
-var http = require('http');
+import http from 'http'
+import { CorePath } from './path'
+let config = require(CorePath+'/site/config/config.json')
 
-var port = normalizePort(process.env.PORT || '3000');
+var port = normalizePort(config.port);
 
 export default (app) => {
   // Get port from environment and store in Express
