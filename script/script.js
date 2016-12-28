@@ -1,3 +1,34 @@
+
+function loadImage(url) {
+  return new Promise((resolve, reject) => {
+    let image = new Image()
+    console.log('prom', url)
+    image.onload=resolve
+    image.onerror=resolve
+    image.src=url
+    setTimeout(resolve, 1500)
+  })
+}
+
+function loadImagesFirst() { // First load
+  let loadImagePromises = []
+  var srcList=Array.prototype.map.call(document.images, img => img.src)
+  srcList.forEach(url=>loadImagePromises.push(loadImage(url)))
+  Promise.all(loadImagePromises).then(()=>{
+    document.getElementById('loading-screen').style.display = 'none'
+    document.getElementById('full-screen').style.display = 'block'
+  })
+}
+
+function loadImagesSecond() { // Load page only
+  let loadImagePromises = []
+  var srcList=Array.prototype.map.call(document.images, img => img.src)
+  srcList.forEach(url=>loadImagePromises.push(loadImage(url)))
+  Promise.all(loadImagePromises).then(()=>{
+    document.getElementById('page').innerHTML = document.getElementById('page-hidden').innerHTML
+  })
+}
+
 $(document).ready(function(){
   var hasClass = function(e, className) {
     return (' ' + e.className + ' ').indexOf(' ' + className + ' ') > -1;
@@ -33,10 +64,12 @@ $(document).ready(function(){
   var loadPage = document.getElementById('page').getAttribute('loadPage')
   if (loadPage && loadPage === 'true')
     LoadPage(current)
+
+  loadImagesFirst()
 })
 
 function SetPage(path, html) {
-  document.getElementById('page').innerHTML = html
+  document.getElementById('page-hidden').innerHTML = html
   document.getElementById('page').setAttribute('current', path)
   var title = ''
   var replaceClass = document.getElementById('page-title').getAttribute('rclass')
@@ -50,11 +83,12 @@ function SetPage(path, html) {
     if (forcePath = forcePath.getAttribute('path'))
       path = forcePath
   window.history.pushState({ html: html }, title, path)
+  loadImagesSecond()
 }
 
 window.onpopstate = function(e){
   if (e.state)
-    document.getElementById("page").innerHTML = e.state.html
+    document.getElementById("page-hidden").innerHTML = e.state.html
 }
 
 function LoadPage(path) {
