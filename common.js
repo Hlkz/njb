@@ -1,7 +1,8 @@
 import busboy from 'busboy'
 
 let common = module.exports = {
-  error: e => { console.error(e) },
+  error: e => { if (e) console.log(e) },
+  mysql_error: e => { if (e) console.log(e) },
   mysql_real_escape_string: str => str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
     switch (char) {
       case "\0": return "\\0";

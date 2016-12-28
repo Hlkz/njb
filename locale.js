@@ -68,7 +68,7 @@ Locale.loadContent = function(name, force = false) {
       Promise.all([
         this.loadPage_t(name),
         this.loadPage_txt(name)
-      ]).then(() => {
+      ]).then(() => { // _t & _txt can be used compiling _pug
         this.loadPage_pug(name).then(() => {
           if (!name)
             this.fullLoaded = true
@@ -88,16 +88,20 @@ Locale.loadPage_t = function(name) {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
     this.db.query(query, function(err, rows, fields) {
-      if (err) reject(err);
-      if (rows)
-      rows.forEach(row => {
-        let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
-        this._t[_page] = this._t[_page] || {}
-        this._t[_page][_name] = this._t[_page][_name] || {}
-        this._t[_page][_name]['fr'] = row['fr']
-        this._t[_page][_name]['en'] = row['en']
-       })
-       resolve()
+      if (err) {
+        common.mysql_error(err)
+        reject()
+      }
+      else {
+        rows.forEach(row => {
+          let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
+          this._t[_page] = this._t[_page] || {}
+          this._t[_page][_name] = this._t[_page][_name] || {}
+          this._t[_page][_name]['fr'] = row['fr']
+          this._t[_page][_name]['en'] = row['en']
+        })
+        resolve()
+      }
     }.bind(this))
   })
 }
@@ -107,16 +111,20 @@ Locale.loadPage_txt = function(name) {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
     this.db.query(query, function(err, rows, fields) {
-      if (err) reject(err);
-      if (rows)
-      rows.forEach(row => {
-        let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
-        this._txt[_page] = this._txt[_page] || {}
-        this._txt[_page][_name] = this._txt[_page][_name] || {}
-        this._txt[_page][_name]['fr'] = row['fr']
-        this._txt[_page][_name]['en'] = row['en']
-       })
-       resolve()
+      if (err) {
+        common.mysql_error(err)
+        reject()
+      }
+      else {
+        rows.forEach(row => {
+          let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
+          this._txt[_page] = this._txt[_page] || {}
+          this._txt[_page][_name] = this._txt[_page][_name] || {}
+          this._txt[_page][_name]['fr'] = row['fr']
+          this._txt[_page][_name]['en'] = row['en']
+        })
+        resolve()
+      }
     }.bind(this))
   })
 }
@@ -132,9 +140,9 @@ Locale.loadPugLocale = function(pattern, container, locale, page) {
     }
     pug.render(pattern, locals, (err, html) => {
       if (err) {
-        //catch error
-        console.log(err)
+        common.error(err)
         container[locale] = null
+        reject()
       } else {
         container[locale] = html
       }
@@ -148,21 +156,23 @@ Locale.loadPage_pug = function(name) {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_pug'+(name ? ' WHERE page=\''+name+'\'' : '')
     this.db.query(query, function(err, rows, fields) {
-      if (err) reject(err);
+      if (err) {
+        common.mysql_error(err)
+        reject()
+      }
+      else {
         var promises = []
-      if (rows)
-      rows.forEach(row => {
-        let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
-        this._pug[_page] = this._pug[_page] || {}
-        this._pug[_page][_name] = this._pug[_page][_name] || {}
-        this._pug[_page][_name]['fr'] = null
-        this._pug[_page][_name]['en'] = null
-        promises.push(this.loadPugLocale(row['fr'], this._pug[_page][_name], 'fr', _page))
-        promises.push(this.loadPugLocale(row['en'], this._pug[_page][_name], 'en', _page))
-      })
-      Promise.all(promises).then(() => {
-        resolve()
-      }, common.error)
+        rows.forEach(row => {
+          let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
+          this._pug[_page] = this._pug[_page] || {}
+          this._pug[_page][_name] = this._pug[_page][_name] || {}
+          this._pug[_page][_name]['fr'] = null
+          this._pug[_page][_name]['en'] = null
+          promises.push(this.loadPugLocale(row['fr'], this._pug[_page][_name], 'fr', _page))
+          promises.push(this.loadPugLocale(row['en'], this._pug[_page][_name], 'en', _page))
+        })
+        Promise.all(promises).then(resolve, reject)
+      }
     }.bind(this))
   })
 }
