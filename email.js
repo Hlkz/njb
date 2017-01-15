@@ -1,39 +1,57 @@
 import nodemailer from 'nodemailer'
-
 import { CorePath } from './path'
 let config = require(CorePath+'/site/config/config.json')
 let config_mail = config.mail
-// config_mail.service
-// config_mail.user
-// config_mail.pass
 
-let transporter = nodemailer.createTransport({
-  service: config_mail.service,
+const smtpConfig = {
+  pool: true,
+  maxConnections: 5,
+  host: config_mail.host,
+  port: 587,
+  secure: false,
   auth: {
     user: config_mail.user,
     pass: config_mail.pass
+  },
+  tls: {
+    rejectUnauthorized: false
   }
+}
+
+const transporter = nodemailer.createTransport(smtpConfig)
+transporter.verify((err, data)=>{
+  if (err)
+    common.error(err)
+  else
+    console.log('Server SMTP ready')
 })
 
-function send(mailTo, mailSubject, mailHtml) {
+let sendMail = (mailTo, mailSubject, mailText, mailHtml) => {
+  const mailFrom = config_mail.user
+  const mailOptions = {
+    from: mailFrom,
+    to: mailTo,
+    subject: mailSubject,
+    text: mailText,
+    html: mailHtml
+  }
   return new Promise((resolve, reject) => {
-    let mailFrom = config_mail.user
-    let mailOptions = {
-     from: mailFrom,
-      to: mailTo,
-      subject: mailSubject,
-      //text: 'Hello world',
-      html: mailHtml
-    }
-    transporter.sendMail(mailOptions, function(error, info) {
-      if (!error)
-        resolve()
+    transporter.sendMail(mailOptions, function(err, data) {
+      if (err) {
+        common.error(err)
+        reject(err)
+      }
       else
-        reject(error)
+        resolve(data)
     })
   })
 }
 
+let sendText = (mailTo, mailSubject, mailText) => sendMail(mailTo, mailSubject, mailText, null)
+let sendHtml = (mailTo, mailSubject, mailHtml) => sendMail(mailTo, mailSubject, ' ', mailHtml)
+
 export default {
-  send,
+  sendMail,
+  sendText,
+  sendHtml
 }
