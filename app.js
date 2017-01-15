@@ -1,7 +1,7 @@
 import path from 'path'
 import express from 'express'
+import fs from 'fs'
 import favicon from 'serve-favicon'
-import logger from 'morgan'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import File from './file'
@@ -14,7 +14,9 @@ app.set('dirname', __dirname)
 app.set('views', path.join(CorePath, 'njb/pug'))
 app.set('view engine', 'pug')
 
-app.use(logger('dev'))
+import log from './log'
+log(app)
+
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cookieParser())
