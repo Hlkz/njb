@@ -1,4 +1,5 @@
 import express from 'express'
+import common from './common'
 import File from './file'
 import Process from './process'
 import { LibPath } from './path'
