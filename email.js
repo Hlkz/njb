@@ -27,7 +27,7 @@ transporter.verify((err, data)=>{
 })
 
 let sendMail = (mailTo, mailSubject, mailText, mailHtml) => {
-  const mailFrom = config_mail.user
+  const mailFrom = config_mail.name+' <'+config_mail.user+'>'
   const mailOptions = {
     from: mailFrom,
     to: mailTo,
