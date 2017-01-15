@@ -11,27 +11,30 @@ export default (app) => {
   let db = app.get('database')
   let query = 'SELECT name, base, path, fr, en, regexfr, regexen, layout FROM '+db.prefix+'pages WHERE !hidden'
   db.query(query, function(err, rows, fields) {
-    if (err) throw err;
-    pages = rows
-    pages.forEach(page => {
-      if (page['path'] !== '') {
-        let jsPath = LibPath+'/site/page/'+page['path']+'.js'
-        if (File.exists(jsPath)) {
-          let js = require(jsPath)
-          page['js'] = js
+    if (err)
+      common.mysql_error(err)
+    else {
+      pages = rows
+      pages.forEach(page => {
+        if (page['path'] !== '') {
+          let jsPath = LibPath+'/site/page/'+page['path']+'.js'
+          if (File.exists(jsPath)) {
+            let js = require(jsPath)
+            page['js'] = js
+          }
         }
-      }
-      page['urlfr'] = '/'+(page['base']+'/'+page['fr']).match(/^\/{0,}(.*)$/)[1]
-      page['urlen'] = '/'+(page['base']+'/'+page['en']).match(/^\/{0,}(.*)$/)[1]
-    })
-    app.set('pages', pages)
-    // Store pages_by_name in locale (for links generation)
-    let pages_by_name = {}
-    app.get('locale').pages_by_name = pages_by_name
-    pages.forEach(page => {
-      pages_by_name[page['name']] = page
-    })
-    LoadRouter(app)
+        page['urlfr'] = '/'+(page['base']+'/'+page['fr']).match(/^\/{0,}(.*)$/)[1]
+        page['urlen'] = '/'+(page['base']+'/'+page['en']).match(/^\/{0,}(.*)$/)[1]
+      })
+      app.set('pages', pages)
+      // Store pages_by_name in locale (for links generation)
+      let pages_by_name = {}
+      app.get('locale').pages_by_name = pages_by_name
+      pages.forEach(page => {
+        pages_by_name[page['name']] = page
+      })
+      LoadRouter(app)
+    }
   })
 }
 

@@ -20,7 +20,7 @@ let mysqlConnect = () => {
     }
   })
   db.on('error', err => {
-    console.log('db error', err)
+    console.log('DB ON ERROR')
     if (err.code ==='PROTOCOL_CONNECTION_LOST')
       mysqlConnect()
     else
