@@ -97,4 +97,6 @@ let LoadRouter = app => {
       error: {}
     })
   })
+
+  console.log('Server Router ready')
 }
