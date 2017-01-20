@@ -33,14 +33,10 @@ if (File.exists(gulpAddPath))
 let config = require(path.join(CorePath, 'site/config/config.json'))
 app.set('config', config)
 
-// database setup
-import { db } from './database'
-app.set('database', db)
-
 // locale
 import locale from './locale'
 app.set('locale', locale)
-locale.load(db, true)
+locale.load(true)
 
 // Routes
 import prefix from './prefix'

@@ -1,7 +1,8 @@
 import pug from 'pug'
 import common from './common' // error handle only
+import db from './database'
 
-// // Set db, set lib to var / load it 
+// // Set lib to var / load it 
 // let db = mysql.createConnection()
 // db.prefix = 'string' // tables prefix_locale_t, prefix_locale_txt, prefix_locale_pug
 // import Locale from './locale'
@@ -24,8 +25,7 @@ let Locale = {}
 // Public
 //
 
-Locale.load = function (db, allowPageContentOnly = true) {
-  this.db = db
+Locale.load = function (allowPageContentOnly = true) {
   this.allowPageContentOnly = allowPageContentOnly
 }
 
@@ -86,8 +86,8 @@ Locale.loadContent = function(name, force = false) {
 Locale.loadPage_t = function(name) {
   return new Promise((resolve, reject) => {
     name = name === 'default' ? '' : name
-    let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
-    this.db.query(query, function(err, rows, fields) {
+    let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
+    db.query(query, function(err, rows, fields) {
       if (err) {
         common.mysql_error(err)
         reject()
@@ -109,8 +109,8 @@ Locale.loadPage_t = function(name) {
 Locale.loadPage_txt = function(name) {
   return new Promise((resolve, reject) => {
     name = name === 'default' ? '' : name
-    let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
-    this.db.query(query, function(err, rows, fields) {
+    let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
+    db.query(query, function(err, rows, fields) {
       if (err) {
         common.mysql_error(err)
         reject()
@@ -154,8 +154,8 @@ Locale.loadPugLocale = function(pattern, container, locale, page) {
 Locale.loadPage_pug = function(name) {
   return new Promise((resolve, reject) => {
     name = name === 'default' ? '' : name
-    let query = 'SELECT page, name, fr, en FROM '+this.db.prefix+'locale_pug'+(name ? ' WHERE page=\''+name+'\'' : '')
-    this.db.query(query, function(err, rows, fields) {
+    let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_pug'+(name ? ' WHERE page=\''+name+'\'' : '')
+    db.query(query, function(err, rows, fields) {
       if (err) {
         common.mysql_error(err)
         reject()
@@ -260,7 +260,6 @@ Locale._txt = {}
 Locale._pug = {}
 Locale.loaded = []
 Locale.fullLoaded = false
-Locale.db = null
 Locale.pages_by_name = []
 Locale.allowPageContentOnly = true
 /* Instance members */

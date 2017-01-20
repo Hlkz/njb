@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer'
+import common from './common'
 import { CorePath } from './path'
 let config = require(CorePath+'/site/config/config.json')
 let config_mail = config.mail

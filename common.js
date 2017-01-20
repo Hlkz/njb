@@ -40,6 +40,14 @@ let mergeObj = (o1, o2) => {
       o1[i] = o2[i]
 }
 
+let duplicateArray = (a) => {
+  let i = a.length
+  let b = Array(i)
+  while(i--)
+    b[i] = a[i]
+  return b 
+}
+
 let busform = (req, callback, ...args) => {
   if (!(typeof req.headers === 'object' && typeof req.headers['content-type'] === 'string'))
     return callback(null)
@@ -61,5 +69,6 @@ export default {
   mysql_error,
   mysql_real_escape_string,
   mergeObj,
+  duplicateArray,
   busform
 }

@@ -1,5 +1,6 @@
 import express from 'express'
 import common from './common'
+import db from './database'
 import File from './file'
 import Process from './process'
 import { LibPath } from './path'
@@ -9,7 +10,6 @@ let env = process.env.NODE_ENV
 export default (app) => {
   // Load pages
   let pages = []
-  let db = app.get('database')
   let query = 'SELECT name, base, path, fr, en, regexfr, regexen, layout FROM '+db.prefix+'pages WHERE !hidden'
   db.query(query, function(err, rows, fields) {
     if (err)
