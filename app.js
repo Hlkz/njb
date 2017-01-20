@@ -5,6 +5,7 @@ import favicon from 'serve-favicon'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import File from './file'
+import command from './command' // load command
 import { CorePath, DataPath, LibPath } from './path'
 
 let app = express()

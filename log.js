@@ -15,5 +15,5 @@ let accessLogStream = FileStreamRotator.getStream({
 })
 
 export default (app) => {
-  app.use(morgan('dev', {stream: accessLogStream}))
+  app.use(morgan('combined', {stream: accessLogStream}))
 }
