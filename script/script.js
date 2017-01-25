@@ -11,7 +11,7 @@ function getAllElementsWithAttribute(attribute) {
 function loadImage(url) {
   return new Promise((resolve, reject) => {
     let image = new Image()
-    console.log('prom', url)
+    //console.log('img', url)
     image.onload=resolve
     image.onerror=resolve
     image.src=url

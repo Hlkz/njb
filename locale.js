@@ -1,5 +1,5 @@
 import pug from 'pug'
-import common from './common' // error handle only
+import log from './log'
 import db from './database'
 
 // // Set lib to var / load it 
@@ -48,7 +48,7 @@ Locale.loadPage = function() {
     })
     Promise.all(loadContent).then(() => {
       resolve()
-    }, common.error)
+    }, log.error)
   })
 }
 
@@ -79,8 +79,8 @@ Locale.loadContent = function(name, force = false) {
           else if (!this.isContentLoaded(name))
             this.loaded.push(name)
           resolve()
-        }, common.error)
-      }, common.error)
+        }, log.error)
+      }, log.error)
     }
     else
       resolve()
@@ -92,10 +92,8 @@ Locale.loadPage_t = function(name) {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
-      if (err) {
-        common.mysql_error(err)
+      if (err)
         reject()
-      }
       else {
         rows.forEach(row => {
           let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
@@ -115,10 +113,8 @@ Locale.loadPage_txt = function(name) {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
-      if (err) {
-        common.mysql_error(err)
+      if (err)
         reject()
-      }
       else {
         rows.forEach(row => {
           let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
@@ -144,7 +140,7 @@ Locale.loadPugLocale = function(pattern, container, locale, page) {
     }
     pug.render(pattern, locals, (err, html) => {
       if (err) {
-        common.error(err)
+        log.error(err)
         container[locale] = null
         reject()
       } else {
@@ -160,10 +156,8 @@ Locale.loadPage_pug = function(name) {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_pug'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
-      if (err) {
-        common.mysql_error(err)
+      if (err)
         reject()
-      }
       else {
         var promises = []
         rows.forEach(row => {

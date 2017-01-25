@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer'
-import common from './common'
+import log from './log'
 import { CorePath } from './path'
 let config = require(CorePath+'/site/config/config.json')
 let config_mail = config.mail
@@ -22,9 +22,9 @@ const smtpConfig = {
 const transporter = nodemailer.createTransport(smtpConfig)
 transporter.verify((err, data)=>{
   if (err)
-    common.error(err)
+    log.error(err)
   else
-    console.log('Server SMTP ready')
+    log.info('Server SMTP ready')
 })
 
 let sendMail = (mailTo, mailSubject, mailText, mailHtml) => {
@@ -39,7 +39,7 @@ let sendMail = (mailTo, mailSubject, mailText, mailHtml) => {
   return new Promise((resolve, reject) => {
     transporter.sendMail(mailOptions, function(err, data) {
       if (err) {
-        common.error(err)
+        log.error(err)
         reject(err)
       }
       else

@@ -1,4 +1,4 @@
-import common from './common'
+import log from './log'
 import File from './file'
 import Render from './render'
 import { CorePath } from './path'
@@ -19,7 +19,7 @@ function NewPage(path, js = null) {
   }
 }
 
-module.exports = function Process(req, res, last = null) {
+export default function Process(req, res, last = null) {
   // Get page if exists
   let base = req.baseUrl
   let isContent = false
@@ -72,7 +72,7 @@ module.exports = function Process(req, res, last = null) {
   res.setPost = (post = true) => { res.viewLocals['post'] = post }
   res.setForm = (form = 0) => { res.viewLocals['form'] = form }
   res.setData = (key, data) => { res.viewLocals[key] = data }
-  console.log(common.dateString(), 'Page:', page['name'], '('+(isContent?'component':'full page')+')')
+  log.info('Page: ' + page['name'] + ' ('+(isContent?'component':'full page')+')')
 
   let js = page['js']
 
@@ -96,9 +96,9 @@ module.exports = function Process(req, res, last = null) {
 
         Render(req, res, page, isContent)
 
-      }, common.error)
-    }, common.error)
-  }, common.error)
+      }, log.error)
+    }, log.error)
+  }, log.error)
 
   return true
 }

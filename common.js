@@ -1,23 +1,5 @@
+import log from './log'
 import busboy from 'busboy'
-
-let dateString = () => {
-  let d = new Date()
-  return d.getFullYear()+'/'+d.getMonth()+'/'+d.getDate()+' '+d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()
-}
-
-let error = e => {
-  if (e) {
-    console.log(dateString(), 'Error')
-    console.log(e)
-  }
-}
-
-let mysql_error = e => {
-  if (e) {
-    console.log(dateString(), 'Database Error')
-    console.log(e)
-  }
-}
 
 let mysql_real_escape_string = str => str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
   switch (char) {
@@ -72,9 +54,6 @@ let busform = (req, callback, ...args) => {
 }
 
 export default {
-  dateString,
-  error,
-  mysql_error,
   mysql_real_escape_string,
   textToHTML,
   mergeObj,

@@ -1,8 +1,9 @@
 import express from 'express'
-import common from './common'
+import log from './log'
 import db from './database'
 import File from './file'
 import Process from './process'
+import locale from './locale'
 import { LibPath } from './path'
 
 let env = process.env.NODE_ENV
@@ -11,10 +12,8 @@ export default (app) => {
   // Load pages
   let pages = []
   let query = 'SELECT name, base, path, fr, en, regexfr, regexen, layout FROM '+db.prefix+'pages WHERE !hidden'
-  db.query(query, function(err, rows, fields) {
-    if (err)
-      common.mysql_error(err)
-    else {
+  db.query(query, function(err, rows) {
+    if (!err) {
       pages = rows
       pages.forEach(page => {
         if (page['path'] !== '') {
@@ -30,7 +29,7 @@ export default (app) => {
       app.set('pages', pages)
       // Store pages_by_name in locale (for links generation)
       let pages_by_name = {}
-      app.get('locale').pages_by_name = pages_by_name
+      locale.pages_by_name = pages_by_name
       pages.forEach(page => {
         pages_by_name[page['name']] = page
       })
@@ -98,5 +97,5 @@ let LoadRouter = app => {
     })
   })
 
-  console.log('Server Router ready')
+  log.info('Server Router ready')
 }

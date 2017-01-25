@@ -1,5 +1,6 @@
 import pug from 'pug'
 import common from './common'
+import log from './log'
 import { CorePath } from './path'
 
 module.exports = function Render(req, res, page, isContent) {
@@ -40,20 +41,20 @@ module.exports = function Render(req, res, page, isContent) {
     view = viewLayout
 
   function treat(err, html) {
-    if (err) return common.error(err)
+    if (err) return log.error(err)
 
     if (!isContent && !loadfull) // Only layout
       res.send(html)
     else
       res.render('page', { title: title, path: locals.pagePath, page: html }, (err, html) => {
-        if (err) return common.error(err)
+        if (err) return log.error(err)
 
         if (!loadfull)
           res.send(html) // Only page
         else {
           locals.content = html
           pug.renderFile(viewLayout, locals, (err, html) => {
-            if (err) return common.error(err)
+            if (err) return log.error(err)
             res.send(html) // Full page
           })
         }

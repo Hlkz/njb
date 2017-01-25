@@ -1,5 +1,6 @@
 import mysql from 'mysql'
 import common from './common'
+import log from './log'
 import { CorePath } from './path'
 let config = require(CorePath+'/site/config/config.json')
 
@@ -19,7 +20,7 @@ let query = function() {
   let callback = args[args.length-1] //last arg is callback
   pool.getConnection((err, connection) => {
     if (err) {
-      common.mysql_error(err)
+      log.mysql_error(err)
       return callback(err)
     }
     if (args.length > 2)
@@ -27,7 +28,7 @@ let query = function() {
     connection.query(args[0], sql_args, (err, results, fields) => {
       connection.release() // always put connection back in pool after last query
       if (err) {
-        common.mysql_error(err)
+        log.mysql_error(err)
         return callback(err)
       }
       callback(null, results, fields)

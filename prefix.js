@@ -1,3 +1,4 @@
+import locale from './locale'
 import { CorePath } from './path'
 let config = require(CorePath+'/site/config/config.json')
 
@@ -20,17 +21,17 @@ export default (req, res, next) => {
   //console.log("DOMAIN", domain)
   //console.log("PORT", port)
 
-  let locale = req.locale = {}
-  Object.setPrototypeOf(locale, req.app.get('locale'))
+  let newLocale = req.locale = {}
+  Object.setPrototypeOf(newLocale, locale)
 
   switch(prefix) {
     case '':
     case 'www':
     case 'fr':
-      locale.setLocale('fr')
+      newLocale.setLocale('fr')
       break
     case 'en':
-      locale.setLocale('en')
+      newLocale.setLocale('en')
       break
     default:
       res.status(404).end()

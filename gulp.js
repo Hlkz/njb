@@ -16,8 +16,7 @@ import buffer from 'vinyl-buffer'
 import uglify from 'gulp-uglify'
 import rename from 'gulp-rename'
 
-
-import common from './common'
+import log from './log'
 import File from './file'
 import { CorePath, DataPath } from './path'
 
@@ -52,7 +51,7 @@ gulp.task('build-corejs', () => {
     gulp.src(CorePath+'/njb/script/*.js'),
     babel(script_babelrc),
     buffer(),
-    uglify().on('error', common.error),
+    uglify().on('error', log.error),
     rename({ suffix: '.min' }),
     gulp.dest(DataPath+'/build/js/')
   ])
@@ -63,7 +62,7 @@ gulp.task('build-js', () => {
     gulp.src(CorePath+'/site/script/*.js'),
     babel(script_babelrc),
     //buffer(),
-    //uglify().on('error', common.error),
+    //uglify().on('error', log.error),
     rename({ suffix: '.min' }),
     gulp.dest(DataPath+'/build/js/')
   ])

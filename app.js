@@ -1,9 +1,11 @@
-import path from 'path'
 import express from 'express'
+import path from 'path'
 import fs from 'fs'
 import favicon from 'serve-favicon'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
+import locale from './locale'
+import log from './log'
 import File from './file'
 import command from './command' // load command
 import { CorePath, DataPath, LibPath } from './path'
@@ -15,8 +17,7 @@ app.set('dirname', __dirname)
 app.set('views', path.join(CorePath, 'njb/pug'))
 app.set('view engine', 'pug')
 
-import log from './log'
-log(app)
+log.load(app)
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
@@ -35,8 +36,6 @@ let config = require(path.join(CorePath, 'site/config/config.json'))
 app.set('config', config)
 
 // locale
-import locale from './locale'
-app.set('locale', locale)
 locale.load(true)
 
 // Routes

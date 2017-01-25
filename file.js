@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-module.exports = {
+export default {
   exists: fp => {
     try {
       fs.accessSync(fp)
