@@ -52,6 +52,10 @@ Locale.loadPage = function() {
   })
 }
 
+Locale.locField = function(en, fr) {
+  return this.locale === 'en' ? en : fr
+}
+
 //
 // Private
 //
@@ -246,8 +250,26 @@ Locale.getPageLink = function(name, title = null, self = null) {
   return ''
 }
 
-Locale.getToogleDivLink = function(name, div) {
-  return pug.render('li: a(href=\'#\', toogle-div=\''+div+'\') '+this.t(name))
+Locale.getLink = function(href, name) {
+  return pug.render('a(href=\''+href+'\') '+this.t(name))
+}
+
+Locale.getToggleDivLink = function(div, textShow, textHide) {
+  textShow = textShow || 'show'
+  textHide = textHide || 'hide'
+  return pug.render('a(href=\'#\', toggle-div=\''+div+'\', text-show=\''+this.t(textShow)+'\', text-hide=\''+this.t(textHide)+'\')')
+}
+
+Locale.getToggleSingleDivLink = function(div, name) {
+  return pug.render('a(href=\'#\', toggle-single-div=\''+div+'\') '+this.t(name))
+}
+
+Locale.getDay = function(day) {
+  return this.t('day'+day)
+}
+
+Locale.getMonth = function(month) {
+  return this.t('month'+month)
 }
 
 //

@@ -34,6 +34,14 @@ let mysql_real_escape_string = str => str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g,
   }
 })
 
+let textToHTML = text => ((text || "") + "")
+  .replace(/&/g, "&amp;")
+  .replace(/</g, "&lt;")
+  .replace(/>/g, "&gt;")
+  .replace(/\t/g, "    ")
+  .replace(/ /g, "&#8203;&nbsp;&#8203;")
+  .replace(/\r\n|\r|\n/g, "<br />")
+
 let mergeObj = (o1, o2) => {
   for (let i in o2)
     if (o2.hasOwnProperty(i))
@@ -68,6 +76,7 @@ export default {
   error,
   mysql_error,
   mysql_real_escape_string,
+  textToHTML,
   mergeObj,
   duplicateArray,
   busform

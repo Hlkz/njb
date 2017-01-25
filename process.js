@@ -71,6 +71,7 @@ module.exports = function Process(req, res, last = null) {
   res.viewLocals['pagePath'] = pagePath
   res.setPost = (post = true) => { res.viewLocals['post'] = post }
   res.setForm = (form = 0) => { res.viewLocals['form'] = form }
+  res.setData = (key, data) => { res.viewLocals[key] = data }
   console.log(common.dateString(), 'Page:', page['name'], '('+(isContent?'component':'full page')+')')
 
   let js = page['js']

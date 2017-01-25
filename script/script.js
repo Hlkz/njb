@@ -1,4 +1,13 @@
 
+function getAllElementsWithAttribute(attribute) {
+  var matchingElements = []
+  var allElements = document.getElementsByTagName('*')
+  for (var i = 0, n = allElements.length; i < n; i++)
+    if (allElements[i].getAttribute(attribute) !== null) // Element exists with attribute. Add to array.
+      matchingElements.push(allElements[i])
+  return matchingElements;
+}
+
 function loadImage(url) {
   return new Promise((resolve, reject) => {
     let image = new Image()
@@ -29,6 +38,25 @@ function loadImagesSecond() { // Load page only
   })
 }
 
+function loadToggleLinks() {
+  let toggleLinks = getAllElementsWithAttribute('toggle-div')
+  toggleLinks.forEach(button=>{
+    toggleDiv = button.getAttribute('toggle-div')
+    if (toggleDiv) {
+      let target = document.getElementById(toggleDiv)
+      if (target) {
+        let textShow = button.getAttribute('text-show') || ''
+        let textHide = button.getAttribute('text-hide') || textShow
+        let style = window.getComputedStyle(target)
+        if (style.display === 'block')
+          button.innerHTML = textHide
+        else
+          button.innerHTML = textShow
+      }
+    }
+  })
+}
+
 $(document).ready(function(){
   var hasClass = function(e, className) {
     return (' ' + e.className + ' ').indexOf(' ' + className + ' ') > -1;
@@ -41,19 +69,39 @@ $(document).ready(function(){
       var path = e.target.getAttribute('page-path')
       LoadPage(path)
     }
-    else if (e.target.hasAttribute('toogle-div')) {
-      var currentToggle = document.getElementById('current-toggle')
-      var currentToggleDiv = ''
+    else if (e.target.hasAttribute('toggle-div')) {
+      e.preventDefault()
+      let button = e.target
+      toggleDiv = button.getAttribute('toggle-div') || 'notfound'
+      let textShow = button.getAttribute('text-show') || ''
+      let textHide = button.getAttribute('text-hide') || textShow
+      let target = document.getElementById(toggleDiv)
+      if (target) {
+        let style = window.getComputedStyle(target)
+        if (style.display === 'none') {
+          button.innerHTML = textHide
+          target.style.display = 'block'
+        }
+        else {
+          button.innerHTML = textShow
+          target.style.display = 'none'
+        }
+      }
+    }
+    else if (e.target.hasAttribute('toggle-single-div')) {
+      e.preventDefault()
+      let currentToggle = document.getElementById('current-toggle')
+      let currentToggleDiv = ''
       if (currentToggle) {
         if (currentToggleDiv = currentToggle.getAttribute('div')) {
           if (currentToggleDiv.length) {
-            var toHide = document.getElementById(currentToggleDiv)
+            let toHide = document.getElementById(currentToggleDiv)
             if (toHide)
               toHide.style.display = 'none'
           }
-          currentToggleDiv = e.target.getAttribute('toogle-div')
+          currentToggleDiv = e.target.getAttribute('toggle-single-div')
           currentToggle.setAttribute('div', currentToggleDiv)
-          var toShow = document.getElementById(currentToggleDiv)
+          let toShow = document.getElementById(currentToggleDiv)
           if (toShow)
             toShow.style.display = 'block'
         }
@@ -66,6 +114,7 @@ $(document).ready(function(){
     LoadPage(current)
 
   loadImagesFirst()
+  loadToggleLinks()
 })
 
 function SetPage(path, html) {
@@ -84,6 +133,7 @@ function SetPage(path, html) {
       path = forcePath
   window.history.pushState({ html: html }, title, path)
   loadImagesSecond()
+  loadToggleLinks()
 }
 
 window.onpopstate = function(e){
