@@ -21,6 +21,7 @@ module.exports = function Render(req, res, page, isContent) {
   common.mergeObj(locals, res.viewLocals)
   locals.pages = locale.pages_by_name
   locals.t = locale
+  locals.admin = req.session.admin
 
   if (!isContent || loadfull) {
     let menulinks = require(CorePath+'/site/config/menulinks.json')

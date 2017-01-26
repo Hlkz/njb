@@ -37,6 +37,7 @@ let query = function() {
 }
 
 export default {
+  pool,
   query,
   prefix: config_db.prefix
 }

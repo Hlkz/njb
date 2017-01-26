@@ -54,7 +54,7 @@ export default function Process(req, res, last = null) {
     })
   }
   else { // Last process for non registred pages
-    let jsPath = __dirname+'/site/page/'+str+'.js'
+    let jsPath = CorePath+'/site/page/'+str+'.js'
     let pugPath = CorePath+'/site/page/'+str+'.pug'
     let js = null
     if (File.exists(jsPath))

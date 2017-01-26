@@ -3,7 +3,9 @@ import path from 'path'
 import fs from 'fs'
 import favicon from 'serve-favicon'
 import bodyParser from 'body-parser'
-import cookieParser from 'cookie-parser'
+import expressSession from 'express-session'
+import MySQLSession from 'express-mysql-session'
+import database from './database'
 import locale from './locale'
 import log from './log'
 import File from './file'
@@ -12,6 +14,10 @@ import { CorePath, DataPath, LibPath } from './path'
 
 let app = express()
 
+// config
+let config = require(path.join(CorePath, 'site/config/config.json'))
+app.set('config', config)
+
 // view engine setup
 app.set('dirname', __dirname)
 app.set('views', path.join(CorePath, 'njb/pug'))
@@ -19,9 +25,21 @@ app.set('view engine', 'pug')
 
 log.load(app)
 
+// Data from the client
+let MySQLStore = MySQLSession(expressSession)
+var sessionStore = new MySQLStore({}/* session store options */, database.pool)
+app.use(expressSession({
+  key: 'thekey',
+  secret: 'thesecret',
+  store: sessionStore,
+  resave: false,
+  secure: true,
+  saveUninitialized: true,
+}))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
-app.use(cookieParser())
+
+// Public
 app.use('/data', express.static(DataPath))
 app.use(favicon(path.join(DataPath, 'img/favicon.ico')))
 
@@ -30,10 +48,6 @@ require('./gulp')
 let gulpAddPath = LibPath+'/site/gulp.js'
 if (File.exists(gulpAddPath))
   require(gulpAddPath)
-
-// config
-let config = require(path.join(CorePath, 'site/config/config.json'))
-app.set('config', config)
 
 // locale
 locale.load(true)
