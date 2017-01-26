@@ -138,7 +138,8 @@ function SetPage(path, html) {
 
 window.onpopstate = function(e){
   if (e.state)
-    document.getElementById("page-hidden").innerHTML = e.state.html
+    document.getElementById("page").innerHTML = e.state.html
+    // document.getElementById("page-hidden").innerHTML = e.state.html
 }
 
 function LoadPage(path) {
