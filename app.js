@@ -27,7 +27,7 @@ log.load(app)
 
 // Data from the client
 let MySQLStore = MySQLSession(expressSession)
-var sessionStore = new MySQLStore({}/* session store options */, database.pool)
+var sessionStore = new MySQLStore({ schema: { tableName: 'njb_sessions' }}, database.pool)
 app.use(expressSession({
   key: config.cookie.key,
   secret: config.cookie.secret,
