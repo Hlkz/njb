@@ -90,7 +90,7 @@ Locale.loadContent = function(name, force = false) {
 Locale.loadPage_t = function(name) {
   return new Promise((resolve, reject) => {
     name = name === 'default' ? '' : name
-    let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
+    let query = 'SELECT page, name, fr, en FROM njb_locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
       if (err)
         reject()
@@ -111,7 +111,7 @@ Locale.loadPage_t = function(name) {
 Locale.loadPage_txt = function(name) {
   return new Promise((resolve, reject) => {
     name = name === 'default' ? '' : name
-    let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
+    let query = 'SELECT page, name, fr, en FROM njb_locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
       if (err)
         reject()
@@ -154,7 +154,7 @@ Locale.loadPugLocale = function(pattern, container, locale, page) {
 Locale.loadPage_pug = function(name) {
   return new Promise((resolve, reject) => {
     name = name === 'default' ? '' : name
-    let query = 'SELECT page, name, fr, en FROM '+db.prefix+'locale_pug'+(name ? ' WHERE page=\''+name+'\'' : '')
+    let query = 'SELECT page, name, fr, en FROM njb_locale_pug'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
       if (err)
         reject()

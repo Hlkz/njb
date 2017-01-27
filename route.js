@@ -11,7 +11,7 @@ let env = process.env.NODE_ENV
 export default (app) => {
   // Load pages
   let pages = []
-  let query = 'SELECT name, base, path, fr, en, regexfr, regexen, layout FROM '+db.prefix+'pages WHERE !hidden'
+  let query = 'SELECT name, base, path, fr, en, regexfr, regexen, layout FROM njb_pages WHERE !hidden'
   db.query(query, function(err, rows) {
     if (!err) {
       pages = rows
