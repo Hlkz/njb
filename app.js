@@ -29,8 +29,8 @@ log.load(app)
 let MySQLStore = MySQLSession(expressSession)
 var sessionStore = new MySQLStore({}/* session store options */, database.pool)
 app.use(expressSession({
-  key: 'thekey',
-  secret: 'thesecret',
+  key: config.cookie.key,
+  secret: config.cookie.secret,
   store: sessionStore,
   resave: false,
   secure: true,

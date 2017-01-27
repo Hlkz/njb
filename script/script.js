@@ -108,15 +108,24 @@ $(document).ready(function(){
       }
     }
   })
+
+  // Load page content if needed
   var current = document.getElementById('page').getAttribute('current')
   var loadPage = document.getElementById('page').getAttribute('loadPage')
   if (loadPage && loadPage === 'true')
     LoadPage(current)
 
+  // Change page url if needed
+  // var forcePath = null
+  // if (forcePath = document.getElementById('page-path'))
+  //   if (forcePath = forcePath.getAttribute('path'))
+  //     History.replaceState(null, document.title, forcePath)
+
   loadImagesFirst()
   loadToggleLinks()
 })
 
+// Replace page content
 function SetPage(path, html) {
   document.getElementById('page-hidden').innerHTML = html
   document.getElementById('page').setAttribute('current', path)
@@ -131,17 +140,20 @@ function SetPage(path, html) {
   if (forcePath = document.getElementById('page-path'))
     if (forcePath = forcePath.getAttribute('path'))
       path = forcePath
-  window.history.pushState({ html: html }, title, path)
+      // path = window.location.origin + '/' + forcePath
+  History.pushState({ html: html }, title, path)
   loadImagesSecond()
   loadToggleLinks()
 }
 
+// Previous page: display previous page content
 window.onpopstate = function(e){
-  if (e.state)
+  if (e.state && e.state.html)
     document.getElementById("page").innerHTML = e.state.html
     // document.getElementById("page-hidden").innerHTML = e.state.html
 }
 
+// Send request for next page content
 function LoadPage(path) {
   var url = '/page'+path;
   var xhr = new XMLHttpRequest()
