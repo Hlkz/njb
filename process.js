@@ -73,6 +73,7 @@ export default function Process(req, res, last = null) {
   res.setForm = (form = 0) => { res.viewLocals['form'] = form }
   res.setData = (key, data) => { res.viewLocals[key] = data }
   log.info('Page: ' + page['name'] + ' ('+(isContent?'component':'full page')+')')
+  locale.setPage(page['name'])
 
   let js = page['js']
 

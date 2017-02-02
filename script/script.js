@@ -1,11 +1,32 @@
 
+function changeTag(elem, newTag) {
+  let newElem = document.createElement(newTag)
+  let index
+
+  // Copy the children
+  while (elem.firstChild)
+    newElem.appendChild(elem.firstChild) // *Moves* the child
+
+  // Copy the attributes
+  for (index = elem.attributes.length - 1; index >= 0; --index)
+    newElem.attributes.setNamedItem(elem.attributes[index].cloneNode())
+  // Replace it
+  elem.parentNode.replaceChild(newElem, elem);
+}
+
+function getDivAttr(id, attr) {
+  let div = document.getElementById(id)
+  return div ? div.getAttribute(attr) : null
+}
+
 function getAllElementsWithAttribute(attribute) {
   var matchingElements = []
   var allElements = document.getElementsByTagName('*')
-  for (var i = 0, n = allElements.length; i < n; i++)
-    if (allElements[i].getAttribute(attribute) !== null) // Element exists with attribute. Add to array.
-      matchingElements.push(allElements[i])
-  return matchingElements;
+  Array.from(allElements).forEach(elem=>{
+    if (elem.getAttribute(attribute) !== null) // Element exists with attribute. Add to array.
+      matchingElements.push(elem)
+  })
+  return matchingElements
 }
 
 function loadImage(url) {
@@ -19,22 +40,24 @@ function loadImage(url) {
   })
 }
 
-function loadImagesFirst() { // First load
+function loadImagesFirst(callback) { // First load
   let loadImagePromises = []
   var srcList=Array.prototype.map.call(document.images, img => img.src)
   srcList.forEach(url=>loadImagePromises.push(loadImage(url)))
   Promise.all(loadImagePromises).then(()=>{
     document.getElementById('loading-screen').style.display = 'none'
     document.getElementById('full-screen').style.display = 'block'
+    callback()
   })
 }
 
-function loadImagesSecond() { // Load page only
+function loadImagesSecond(callback) { // Load page only
   let loadImagePromises = []
   var srcList=Array.prototype.map.call(document.images, img => img.src)
   srcList.forEach(url=>loadImagePromises.push(loadImage(url)))
   Promise.all(loadImagePromises).then(()=>{
     document.getElementById('page').innerHTML = document.getElementById('page-hidden').innerHTML
+    callback()
   })
 }
 
@@ -53,6 +76,25 @@ function loadToggleLinks() {
         else
           button.innerHTML = textShow
       }
+    }
+  })
+}
+
+function loadPageLinks() {
+  // Old current span to link
+  let currentLinks = document.getElementsByClassName('current-page-link')
+  Array.from(currentLinks).forEach(link=>{
+    link.classList.remove('current-page-link')
+    changeTag(link, 'a')
+  })
+  // New current link to span
+  let current = getDivAttr('page', 'current')
+  let pageLinks = document.getElementsByClassName('page-link')
+  Array.from(pageLinks).forEach(link=>{
+    let href = link.getAttribute('href')
+    if (href && href === current) {
+      link.classList.add('current-page-link')
+      changeTag(link, 'label')
     }
   })
 }
@@ -110,8 +152,8 @@ $(document).ready(function(){
   })
 
   // Load page content if needed
-  var current = document.getElementById('page').getAttribute('current')
-  var loadPage = document.getElementById('page').getAttribute('loadPage')
+  var current = getDivAttr('page', 'current')
+  var loadPage = getDivAttr('page', 'loadPage')
   if (loadPage && loadPage === 'true')
     LoadPage(current)
 
@@ -121,8 +163,9 @@ $(document).ready(function(){
   //   if (forcePath = forcePath.getAttribute('path'))
   //     History.replaceState(null, document.title, forcePath)
 
-  loadImagesFirst()
-  loadToggleLinks()
+  loadImagesFirst(()=>{
+    loadToggleLinks()
+  })
 })
 
 // Replace page content
@@ -142,8 +185,10 @@ function SetPage(path, html) {
       path = forcePath
       // path = window.location.origin + '/' + forcePath
   History.pushState({ html: html }, title, path)
-  loadImagesSecond()
-  loadToggleLinks()
+  loadImagesSecond(()=>{
+    loadToggleLinks()
+    loadPageLinks()
+  })
 }
 
 // Previous page: display previous page content
@@ -178,6 +223,5 @@ function SubmitForm(form) {
   xhr.open('POST', '/page'+path)
   var data = new FormData(form)
   xhr.send(data)
-  console.log(data)
   return false
 }

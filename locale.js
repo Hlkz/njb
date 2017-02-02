@@ -34,6 +34,10 @@ Locale.setLocale = function(locale) {
   this.loc = _loc[locale]
 }
 
+Locale.setPage = function(page) {
+  this.page = page
+}
+
 Locale.setNames = function(names) {
   if (!Array.isArray(names))
     names = [ names ]
@@ -227,6 +231,8 @@ Locale.pug = function (str, self = null) {
 
 Locale.getPageLink = function(name, title = null, self = null) {
   let locale = self ? self.locale : this.locale
+  let current_page = self ? self.page : this.page
+
   if (!locale) return ''
   let page = this.pages_by_name[name]
   if (page) {
@@ -236,10 +242,19 @@ Locale.getPageLink = function(name, title = null, self = null) {
     if (!title)
       title = this.t('title-'+name, self)
 
-    if (this.allowPageContentOnly)
-      return pug.render('a.loadpage(href=\''+pagePath+'\', page-path=\''+pagePath+'\') '+title)
-    else
-      return pug.render('a(href=\''+pagePath+'\') '+title)
+    if (this.allowPageContentOnly) {
+      let cont = '.page-link.loadpage(href=\''+pagePath+'\', page-path=\''+pagePath+'\') '+title
+      if (current_page && current_page === name)
+        return pug.render('span.current-page-link'+cont)
+      else
+        return pug.render('a'+cont)
+    }
+    else {
+      if (current_page && current_page === name)
+        return pug.render('span.page-link.current-page-link '+title)
+      else
+        return pug.render('a.page-link(href=\''+pagePath+'\') '+title)
+    }
   }
   return ''
 }
@@ -282,5 +297,6 @@ Locale.allowPageContentOnly = true
 //locale.locale // 'fr' or 'en'
 //locale.loc = _loc[locale]
 //locale.names // string array
+//Locale.page // string page identifier
 
 export default Locale
