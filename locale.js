@@ -73,6 +73,7 @@ Locale.isContentLoaded = function(name) {
 Locale.loadContent = function(name, force = false) {
   return new Promise((resolve, reject) => {
     if (!this.isContentLoaded(name) || force) {
+      this.resetContent(name)
       Promise.all([
         this.loadPage_t(name),
         this.loadPage_txt(name)
@@ -85,10 +86,23 @@ Locale.loadContent = function(name, force = false) {
           resolve()
         }, log.error)
       }, log.error)
-    }
-    else
+    } else
       resolve()
   })
+}
+
+Locale.resetContent = function(name) { 
+  name = name === 'default' ? '' : name
+  console.log('name', name)
+  if (name) {
+    this._t[name] = {}
+    this._txt[name] = {}
+    this._pug[name] = {}
+  } else {
+    this._t = {}
+    this._txt = {}
+    this._pug = {}
+  }
 }
 
 Locale.loadPage_t = function(name) {
