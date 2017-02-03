@@ -259,8 +259,8 @@ Locale.getPageLink = function(name, title = null, self = null) {
   return ''
 }
 
-Locale.getLink = function(href, name) {
-  return pug.render('a(href=\''+href+'\') '+this.t(name))
+Locale.getLink = function(href, name, newTab = false) {
+  return pug.render('a(href=\''+href+'\''+(newTab ? ', target=\'_blank\'' : '')+') '+this.t(name))
 }
 
 Locale.getToggleDivLink = function(div, textShow, textHide) {
