@@ -36,8 +36,104 @@ let query = function() {
   })
 }
 
+let mysql_real_escape_string = str => str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
+  switch (char) {
+    case "\0": return "\\0";
+    case "\x08": return "\\b";
+    case "\x09": return "\\t";
+    case "\x1a": return "\\z";
+    case "\n": return "\\n";
+    case "\r": return "\\r";
+    case "\"":
+    case "'":
+    case "\\":
+    case "%": return "\\"+char; // prepends a backslash to backslash, percent, and double/single quotes
+  }
+})
+
+// Query API
+
+// table object
+// table.database = 'dbname'
+// table.name = 'tablename'
+// table.keys = [ 'primary1', 'primary2' ]
+// table.fields = [ 'primary1', 'primary2', 'other', 'fields' ]
+
+// row object
+// row.fields = { 'primary1': 42, 'primary2': 1337, 'other': "somedata" }
+
+function checkTable(table) {
+  if (!table.keys || !table.keys.length)
+    return false
+
+  table.keys.forEach(key=>{
+    if (!key || !key.length)
+      return false
+  })
+
+  table.fields.forEach(field=>{
+    if (!field || !field.length)
+      return false
+  })
+  return true
+}
+
+function checkTableRow(table, row) {
+  table.keys.forEach(key => {
+    if (!Object.keys(row.fields).find(field => field === key))
+      return false
+  })
+  Object.keys(row.fields).forEach(field => {
+    if (!table.fields.find(e => e === field))
+      return false
+  })
+  return true
+}
+
+function insert(table, row, callback = null) {
+  if (!checkTable(table) || !checkTableRow(table, row))
+    return false
+
+  let string = 'INSERT INTO ' + (table.database ? table.database + '.' : '') + table.name + ' SET ?'
+  query(string, row.fields, function(err) {
+    if (callback)
+      callback()
+    return true
+  })
+}
+
+function update(table, row, callback = null) {
+  if (!checkTable(table) || !checkTableRow(table, row))
+    return false
+
+  let WHERE = 'WHERE ' + table.keys.map(key => key + ' = \'' + (common.isString(row.fields[key]) ? mysql_real_escape_string(row.fields[key]) : row.fields[key]) + '\'').join(' AND ')
+  let string = 'UPDATE ' + (table.database ? table.database + '.' : '') + table.name + ' SET ? ' + WHERE
+  query(string, row.fields, function(err) {
+    if (callback)
+      callback()
+    return true
+  })
+}
+
+function deleteFrom(table, row, callback = null) {
+  if (!checkTable(table) || !checkTableRow(table, row))
+    return false
+
+  let WHERE = 'WHERE ' + table.keys.map(key => key + ' = \'' + (common.isString(row.fields[key]) ? mysql_real_escape_string(row.fields[key]) : row.fields[key]) + '\'').join(' AND ')
+  let string = 'DELETE FROM ' + (table.database ? table.database + '.' : '') + table.name + ' ' + WHERE
+  query(string, function(err) {
+    if (callback)
+      callback()
+    return true
+  })
+}
+
 export default {
   pool,
   query,
+  mysql_real_escape_string,
   //prefix: config_db.prefix
+  insert,
+  update,
+  deleteFrom,
 }
