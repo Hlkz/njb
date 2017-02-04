@@ -161,7 +161,8 @@ $(document).ready(function(){
   var loadPage = getDivAttr('page', 'loadPage')
   if (loadPage && loadPage === 'true')
     LoadPage(current)
-
+  else
+    History.replaceState({ path: current, html: document.getElementById('page').innerHTML }, document.title, current)
   // Change page url if needed
   // var forcePath = null
   // if (forcePath = document.getElementById('page-path'))
