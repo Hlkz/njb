@@ -95,13 +95,13 @@ Locale.resetContent = function(name) {
   name = name === 'default' ? '' : name
   console.log('name', name)
   if (name) {
-    this._t[name] = {}
-    this._txt[name] = {}
-    this._pug[name] = {}
+    // this._t[name] = {}
+    // this._txt[name] = {}
+    // this._pug[name] = {}
   } else {
-    this._t = {}
-    this._txt = {}
-    this._pug = {}
+    // this._t = {}
+    // this._txt = {}
+    // this._pug = {}
   }
 }
 

@@ -56,9 +56,14 @@ function loadImagesSecond(callback) { // Load page only
   var srcList=Array.prototype.map.call(document.images, img => img.src)
   srcList.forEach(url=>loadImagePromises.push(loadImage(url)))
   Promise.all(loadImagePromises).then(()=>{
-    document.getElementById('page').innerHTML = document.getElementById('page-hidden').innerHTML
     callback()
   })
+}
+
+function onHiddenPageLoaded() {
+  document.getElementById('page').innerHTML = document.getElementById('page-hidden').innerHTML
+  loadToggleLinks()
+  loadPageLinks()
 }
 
 function loadToggleLinks() {
@@ -170,33 +175,34 @@ $(document).ready(function(){
 
 // Replace page content
 function SetPage(path, html) {
+  let original_path = path
   document.getElementById('page-hidden').innerHTML = html
   document.getElementById('page').setAttribute('current', path)
-  var title = ''
   var replaceClass = document.getElementById('page-title').getAttribute('rclass')
   if (!replaceClass)
     replaceClass = ''
   document.getElementById('page').className = replaceClass
-  title = document.getElementById('page-title').getAttribute('title')
-  document.title = title
   var forcePath = null
   if (forcePath = document.getElementById('page-path'))
     if (forcePath = forcePath.getAttribute('path'))
       path = forcePath
       // path = window.location.origin + '/' + forcePath
-  History.pushState({ html: html }, title, path)
   loadImagesSecond(()=>{
-    loadToggleLinks()
-    loadPageLinks()
+    onHiddenPageLoaded()
+    let title = document.getElementById('page-title').getAttribute('title')
+    document.title = title
+    History.pushState({ path: original_path, html: html }, title, path)
   })
 }
 
-// Previous page: display previous page content
-window.onpopstate = function(e){
-  if (e.state && e.state.html)
-    document.getElementById("page").innerHTML = e.state.html
-    // document.getElementById("page-hidden").innerHTML = e.state.html
-}
+// Previous or Next page
+History.Adapter.bind(window,'statechange',function() {
+  let state = History.getState()
+  let data = state.data
+  if (data && data.path && data.html) {
+    SetPage(data.path, data.html)
+  }
+})
 
 // Send request for next page content
 function LoadPage(path) {
