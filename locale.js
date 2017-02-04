@@ -93,7 +93,7 @@ Locale.loadContent = function(name, force = false) {
 
 Locale.resetContent = function(name) { 
   name = name === 'default' ? '' : name
-  console.log('name', name)
+  // TODO: How to reset locales before loading them?
   if (name) {
     // this._t[name] = {}
     // this._txt[name] = {}
