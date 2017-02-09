@@ -40,10 +40,20 @@ let busform = (req, callback, ...args) => {
   req.pipe(bus)
 }
 
+let getpost = (req) => {
+  return new Promise((resolve, reject) => {
+    busform(req, post => {
+      req.body = post
+      resolve()
+    })
+  })
+}
+
 export default {
   isString,
   textToHTML,
   mergeObj,
   duplicateArray,
-  busform
+  busform,
+  getpost,
 }

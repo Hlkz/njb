@@ -2,6 +2,7 @@ import log from './log'
 import File from './file'
 import Render from './render'
 import db from './database'
+import common from './common'
 import { CorePath } from './path'
 
 function NewPage(path, js = null) {
@@ -100,6 +101,9 @@ export default function Process(req, res, last = null) {
 
     promises = []
     promises.push(locale.loadPage())
+    if (isContent)
+      promises.push(common.getpost(req))
+
     if (js && js.LoadSync)
       promises.push(js.LoadSync(req, res, isContent))
     Promise.all(promises).then(() => {
