@@ -80,6 +80,7 @@ export default function Process(req, res, last = null) {
   log.info('Page: ' + page['name'] + ' ('+(isContent?'component':'full page')+')')
   let ua = req.useragent
   db.query('INSERT INTO njb_access_log SET ?', {
+    page: page['name'],
     address: page[loca],
     ip: req.headers['x-forwarded-for'],
     browser: ua.browser,
