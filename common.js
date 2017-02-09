@@ -43,7 +43,8 @@ let busform = (req, callback, ...args) => {
 let getpost = (req) => {
   return new Promise((resolve, reject) => {
     busform(req, post => {
-      req.body = post
+      if (post)
+        req.body = post
       resolve()
     })
   })
