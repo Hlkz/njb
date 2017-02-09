@@ -1,6 +1,7 @@
 import log from './log'
 import File from './file'
 import Render from './render'
+import db from './database'
 import { CorePath } from './path'
 
 function NewPage(path, js = null) {
@@ -72,10 +73,22 @@ export default function Process(req, res, last = null) {
   res.setPost = (post = true) => { res.viewLocals['post'] = post }
   res.setForm = (form = 0) => { res.viewLocals['form'] = form }
   res.setData = (key, data) => { res.viewLocals[key] = data }
-  log.info('Page: ' + page['name'] + ' ('+(isContent?'component':'full page')+')')
   locale.setPage(page['name'])
-
   let js = page['js']
+
+  //log
+  log.info('Page: ' + page['name'] + ' ('+(isContent?'component':'full page')+')')
+  let ua = req.useragent
+  db.query('INSERT INTO njb_access_log SET ?', {
+    address: page[loca],
+    ip: req.headers['x-forwarded-for'],
+    browser: ua.browser,
+    version: ua.version,
+    os: ua.os,
+    platform: ua.platform,
+    source: ua.source,
+    type: ua.isDesktop ? 'desktop' : ua.isMobile ? 'mobile' : ua.isBot ? 'bot' : 'other'
+  }, ()=>{})
 
   let promises = []
   if (js && js.PreLoad)

@@ -5,6 +5,7 @@ import favicon from 'serve-favicon'
 import bodyParser from 'body-parser'
 import expressSession from 'express-session'
 import MySQLSession from 'express-mysql-session'
+import useragent from 'express-useragent'
 import database from './database'
 import locale from './locale'
 import log from './log'
@@ -38,6 +39,7 @@ app.use(expressSession({
 }))
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(useragent.express())
 
 // Public
 app.use('/data', express.static(DataPath))
