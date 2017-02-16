@@ -25,6 +25,7 @@ let duplicateArray = (a) => {
   return b 
 }
 
+// forms handling (without reloading page)
 let busform = (req, callback, ...args) => {
   if (!(typeof req.headers === 'object' && typeof req.headers['content-type'] === 'string'))
     return callback(null)
@@ -40,6 +41,7 @@ let busform = (req, callback, ...args) => {
   req.pipe(bus)
 }
 
+// http post request handling
 let getpost = (req) => {
   return new Promise((resolve, reject) => {
     busform(req, post => {
@@ -50,6 +52,13 @@ let getpost = (req) => {
   })
 }
 
+let timeBeforeNextHour = () => {
+  let d = new Date(),
+    h = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours() + 1, 0, 0, 0) // Next hour
+    // h = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes() + 1, 0, 0) // Next minute
+  return h - d + 100
+}
+
 export default {
   isString,
   textToHTML,
@@ -57,4 +66,5 @@ export default {
   duplicateArray,
   busform,
   getpost,
+  timeBeforeNextHour,
 }
