@@ -47,22 +47,24 @@ let app_babelrc = {
 }
 
 gulp.task('build-corejs', () => {
+  gutil.log('Rebuild...')
   pump([
     gulp.src(CorePath+'/njb/script/*.js'),
-    babel(script_babelrc),
+    babel(script_babelrc).on('error', gutil.log),
     buffer(),
-    uglify().on('error', log.error),
+    uglify().on('error', gutil.log),
     rename({ suffix: '.min' }),
     gulp.dest(DataPath+'/build/js/')
   ])
 })
 
 gulp.task('build-js', () => {
+  gutil.log('Rebuild...')
   pump([
     gulp.src(CorePath+'/site/script/*.js'),
-    babel(script_babelrc),
+    babel(script_babelrc).on('error', gutil.log),
     //buffer(),
-    //uglify().on('error', log.error),
+    //uglify().on('error', gutil.log),
     rename({ suffix: '.min' }),
     gulp.dest(DataPath+'/build/js/')
   ])

@@ -1,4 +1,7 @@
 
+var NJB_SkipSetPage = false
+var jPlayerPlaylists = jPlayerPlaylists || []
+
 function changeTag(elem, newTag) {
   let newElem = document.createElement(newTag)
   let index
@@ -60,12 +63,6 @@ function loadImagesSecond(callback) { // Load page only
   })
 }
 
-function onHiddenPageLoaded() {
-  document.getElementById('page').innerHTML = document.getElementById('page-hidden').innerHTML
-  loadToggleLinks()
-  loadPageLinks()
-}
-
 function loadToggleLinks() {
   let toggleLinks = getAllElementsWithAttribute('toggle-div')
   toggleLinks.forEach(button=>{
@@ -104,12 +101,12 @@ function loadPageLinks() {
   })
 }
 
-$(document).ready(function(){
+$(document).ready(function() {
   var hasClass = function(e, className) {
     return (' ' + e.className + ' ').indexOf(' ' + className + ' ') > -1;
   }
   document.addEventListener('click', function(e) {
-    if (hasClass(e.target, 'loadpage')) {
+    if (e.target.nodeName.toLowerCase() == 'a' && hasClass(e.target, 'loadpage')) {
       if (e.ctrlKey) // Allow new tab click
         return
       e.preventDefault()
@@ -171,11 +168,12 @@ $(document).ready(function(){
 
   loadImagesFirst(()=>{
     loadToggleLinks()
+    LoadjPlayers()
   })
 })
 
-// Replace page content
-function SetPage(path, html) {
+// Update hidden page content
+function SetPage(path, html, pushState = true) {
   let original_path = path
   document.getElementById('page-hidden').innerHTML = html
   document.getElementById('page').setAttribute('current', path)
@@ -189,20 +187,31 @@ function SetPage(path, html) {
       path = forcePath
       // path = window.location.origin + '/' + forcePath
   loadImagesSecond(()=>{
-    onHiddenPageLoaded()
-    let title = document.getElementById('page-title').getAttribute('title')
-    document.title = title
-    History.pushState({ path: original_path, html: html }, title, path)
+    onHiddenPageLoaded(path, html, pushState)
   })
+}
+
+// Update real page content
+function onHiddenPageLoaded(path, html, pushState) {
+  document.getElementById('page').innerHTML = document.getElementById('page-hidden').innerHTML
+  loadToggleLinks()
+  loadPageLinks()
+  LoadjPlayers()
+  let title = document.getElementById('page-title').getAttribute('title')
+  document.title = title
+  if (pushState) {
+    NJB_SkipSetPage = true
+    History.pushState({ path: path, html: html }, title, path)
+  }
 }
 
 // Previous or Next page
 History.Adapter.bind(window,'statechange',function() {
   let state = History.getState()
   let data = state.data
-  if (data && data.path && data.html) {
-    SetPage(data.path, data.html)
-  }
+  if (data && data.path && data.html && !NJB_SkipSetPage)
+    SetPage(data.path, data.html, false)
+  NJB_SkipSetPage = false
 })
 
 // Send request for next page content
@@ -231,4 +240,9 @@ function SubmitForm(form) {
   var data = new FormData(form)
   xhr.send(data)
   return false
+}
+
+function LoadjPlayers() {
+  if (jPlayerPlaylist)
+    jPlayerPlaylists.forEach(list => { new jPlayerPlaylist(list.cssSelector, list.playlist, list.options) })
 }
