@@ -1,7 +1,12 @@
 import log from './log'
 import busboy from 'busboy'
 
+let isObject = v => (typeof v === 'object')
 let isString = v => (typeof v === 'string' || v instanceof String)
+let isFunction = f => {
+  let getType = {}
+  return f && getType.toString.call(f) === '[object Function]'
+}
 
 let textToHTML = text => ((text || "") + "")
   .replace(/&/g, "&amp;")
@@ -52,6 +57,11 @@ let getpost = (req) => {
   })
 }
 
+let timeSince = d => {
+  let now = new Date()
+  return now - d
+}
+
 let timeBeforeNextHour = () => {
   let d = new Date(),
     h = new Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours() + 1, 0, 0, 0) // Next hour
@@ -60,11 +70,14 @@ let timeBeforeNextHour = () => {
 }
 
 export default {
+  isObject,
   isString,
+  isFunction,
   textToHTML,
   mergeObj,
   duplicateArray,
   busform,
   getpost,
+  timeSince,
   timeBeforeNextHour,
 }

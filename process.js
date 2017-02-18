@@ -73,7 +73,10 @@ export default function Process(req, res, last = null) {
   res.viewLocals['pagePath'] = pagePath
   res.setPost = (post = true) => { res.viewLocals['post'] = post }
   res.setForm = (form = 0) => { res.viewLocals['form'] = form }
+  res.setError = str => { res.viewLocals['error'] = str }
   res.setData = (key, data) => { res.viewLocals[key] = data }
+  res.viewLocals['data'] = {}
+  res.setdata = (key, data) => { res.viewLocals.data[key] = data }
   locale.setPage(page['name'])
   let js = page['js']
 

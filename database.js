@@ -25,15 +25,49 @@ let query = function() {
     }
     if (args.length > 2)
       sql_args = args.slice(1, args.length-1)
-    connection.query(args[0], sql_args, (err, results, fields) => {
+    // if (sql_args.length && Array.isArray(sql_args[0]))
+    //   sql_args = sql_args.map(arg => common.isString(arg) ? mysql_real_escape_string(arg) : arg)
+    let query_obj = connection.query(args[0], sql_args, (err, results, fields) => {
       connection.release() // always put connection back in pool after last query
       if (err) {
         log.mysql_error(err)
+        log.mysql_query(query_obj.sql)
         return callback(err)
       }
-      callback(null, results, fields)
+      else
+        return callback(null, results, fields)
     })
   })
+}
+
+let query_c = function() { // query, args, err_func, err_str, func
+  let args = common.duplicateArray(arguments)
+  if (args.length < 2)
+    return
+  let callback = args.splice(-1)[0]
+  if (!common.isFunction(callback))
+    return
+
+  let err_callback = null
+  let err_str = null
+  if (args.length > 1 && common.isFunction(args[args.length-1]))
+    err_callback = args.splice(-1)[0]
+  else if (args.length > 2 && common.isFunction(args[args.length-2])) {
+    err_str = args.splice(-1)[0]
+    err_callback = args.splice(-1)[0]
+  }
+  if (!err_str)
+    err_str = 'sql error'
+
+  args.push((err, results, fields) => {
+    if (err) {
+      if (err_callback)
+        err_callback(err_str)
+    }
+    else
+      callback(results, fields)
+  })
+  query(...args)
 }
 
 let mysql_real_escape_string = str => str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
@@ -128,6 +162,7 @@ function deleteFrom(table, row, callback) {
 export default {
   pool,
   query,
+  query_c,
   mysql_real_escape_string,
   //prefix: config_db.prefix
   // select,

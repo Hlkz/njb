@@ -27,14 +27,13 @@ export default (req, res, next) => {
   switch(prefix) {
     case '':
     case 'www':
-    case 'fr':
       newLocale.setLocale('fr')
       break
     case 'en':
       newLocale.setLocale('en')
       break
     default:
-      res.status(404).end()
+      res.redirect('http://'+domain)
       return false
   }
   next()

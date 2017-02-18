@@ -28,10 +28,13 @@ transporter.verify((err, data)=>{
   else {
     log.info('Server SMTP ready')
     TimeNextQueuedMailSending()
+    SendQueuedMails()
   }
 })
 
 let sendMail = (mailTo, mailSubject, mailText, mailHtml) => {
+  if (!mailText || mailText === '')
+    mailText = ' '
   const mailFrom = config_mail.name+' <'+config_mail.user+'>'
   const mailOptions = {
     from: mailFrom,
@@ -57,54 +60,59 @@ let sendHtml = (mailTo, mailSubject, mailHtml) => sendMail(mailTo, mailSubject, 
 
 // Mail Queue System (for newsletters)
 
-let mail_per_hout_left_count = 0
-
 function TimeNextQueuedMailSending() {
   let time = common.timeBeforeNextHour()
   if (time > 100)
-    setTimeout(SendQueuedMails, time)
+    setTimeout(() => SendQueuedMails(true), time)
+}
+
+function SendQueuedMails(planNext = false) {
+  let clearQuery = 'DELETE FROM njb_mail WHERE id NOT IN ( SELECT DISTINCT id FROM njb_mail_queue WHERE sent=0)'
+  db.query_c('DELETE FROM njb_var WHERE name="mails sent" AND date < Date_sub(now(), interval 1 hour)', () => { // _c
+    db.query_c(clearQuery, () => {
+    db.query_c('SELECT id, subject, content_text, content_html FROM njb_mail', rows => {
+    let mails = {}
+    rows.forEach(mail => { mails[mail.id] = mail })
+    db.query_c('SELECT id, mail, errors FROM njb_mail_queue WHERE errors<3 AND sent=0', rows => {
+    let recipients = rows
+    db.query_c('SELECT value FROM njb_var WHERE name="mails sent"', rows => {
+    let value = rows.length ? rows[0].value : 0
+    let count = 0
+    let leftcount = config_mail.max_per_hour - value
+    log.info('Event: Sending mails to queue (leftCount: ' + leftcount + ', Recipients: ' + recipients.length + ')')
+    while(leftcount > 0 && recipients.length) {
+      SendQueuedMail(mails, recipients.pop())
+      count++
+      leftcount--
+    }
+    db.query_c(rows.length ? 'UPDATE njb_var SET value = ? WHERE name="mails sent"' : 'INSERT INTO njb_var (name, value) VALUES ("mails sent", ?)', value + count, () => {
+    db.query(clearQuery, () => {})
+  }) }) }) }) }) }) // _c
+
+  if (planNext)
+    TimeNextQueuedMailSending(true)
 }
 
 function SendQueuedMail(mails, to) {
-  let error = null
   let mail = mails[to.id]
-  if (mail) {
-    sendMail(to.mail, mail.subject, mail.content_text, mail.content_html).then(()=>{
-      db.query('UPDATE njb_mail_queue SET sent=1 WHERE id=? AND mail=?', to.id, to.mail, function(err) { })
+  let prom = []
+  if (mail)
+    sendMail(to.mail, mail.subject, mail.content_text, mail.content_html).then(() => {
+      db.query('UPDATE njb_mail_queue SET sent=1 WHERE id=? AND mail=?', to.id, to.mail, () => {})
     }, (err) => {
-      error = err
+      QueuedMailSendingError(to, err.message)
     })
-  } else
-    error = 'mail not found'
-  if (error)
-    db.query('UPDATE njb_mail_queue SET errors=errors+1, error'+(to.errors+1)+'=? WHERE id=? AND mail=?', error, to.id, to.mail, function(err) { })
+  else
+    QueuedMailSendingError(to, 'mail not found')
 }
 
-function SendQueuedMails() {
-  db.query('SELECT id, subject, content_text, content_html FROM njb_mail', function(err, rows) {
-    if (!err) {
-      let mails = {};
-      rows.forEach(mail => { mails[mail.id] = mail })
-      db.query('SELECT id, mail, errors FROM njb_mail_queue WHERE errors<3 AND sent=0', function(err, rows) {
-        if (!err) {
-          let recipients = rows
-          mail_per_hout_left_count = config_mail.max_per_hour
-          if (mail_per_hout_left_count > 0 && recipients.length)
-            log.info('Event: Sending mails to queue')
-          while(mail_per_hout_left_count > 0 && recipients.length) {
-            SendQueuedMail(mails, recipients.pop())
-            mail_per_hout_left_count--
-          }
-          db.query('DELETE FROM njb_mail WHERE id NOT IN ( SELECT DISTINCT id FROM njb_mail_queue WHERE sent=0)', function(err) { })
-        }
-      })
-    }
-  })
-  TimeNextQueuedMailSending()
+function QueuedMailSendingError(to, error) {
+  db.query('UPDATE njb_mail_queue SET errors=errors+1, error'+(to.errors+1)+' = ? WHERE id = ? AND mail = ?', error, to.id, to.mail, () => {})
 }
 
 export default {
   sendMail,
   sendText,
-  sendHtml
+  sendHtml,
+  SendQueuedMails,
 }

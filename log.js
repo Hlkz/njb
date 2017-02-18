@@ -21,13 +21,22 @@ let dateString = () => {
   return '[' + d.toLocaleDateString() + ' ' + d.toLocaleTimeString() + ']'
 }
 
-let info = str => {
-  str = dateString() + ' ' + str
+function debug() {
+  let args = common.duplicateArray(arguments)
+  let str = dateString() + ' ' + args.join(' ')
+  writeLog('debug', str)
+}
+
+function info() {
+  let args = common.duplicateArray(arguments)
+  let str = dateString() + ' ' + args.join(' ')
   writeLog('log', str)
   console.log(str)
 }
 
-let error = str => {
+function error() {
+  let args = common.duplicateArray(arguments)
+  let str = args.join(' ')
   if (str) {
     str = dateString() + ` Error
 ` + str
@@ -46,6 +55,11 @@ let mysql_error = str => {
   }
 }
 
+let mysql_query = str => {
+  if (str)
+    writeLog('mysql_queries', str)
+}
+
 let load = app => {
   app.use(morgan('combined', {stream: logStream('access')}))
 }
@@ -55,7 +69,9 @@ let writeLog = (name, data) => logStream(name).write(data+`
 
 export default {
   load,
+  debug,
   info,
   error,
-  mysql_error
+  mysql_error,
+  mysql_query,
 }

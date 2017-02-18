@@ -39,7 +39,7 @@ function loadImage(url) {
     image.onload=resolve
     image.onerror=resolve
     image.src=url
-    setTimeout(resolve, 1500)
+    setTimeout(resolve, 1000)
   })
 }
 

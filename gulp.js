@@ -47,7 +47,6 @@ let app_babelrc = {
 }
 
 gulp.task('build-corejs', () => {
-  gutil.log('Rebuild...')
   pump([
     gulp.src(CorePath+'/njb/script/*.js'),
     babel(script_babelrc).on('error', gutil.log),
@@ -59,7 +58,6 @@ gulp.task('build-corejs', () => {
 })
 
 gulp.task('build-js', () => {
-  gutil.log('Rebuild...')
   pump([
     gulp.src(CorePath+'/site/script/*.js'),
     babel(script_babelrc).on('error', gutil.log),
