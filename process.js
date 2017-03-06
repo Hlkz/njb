@@ -69,14 +69,21 @@ export default function Process(req, res, last = null) {
     return false
 
   // Page exists => proceed
+
+  // Setting pug variables
   res.viewLocals = {}
-  res.viewLocals['pagePath'] = pagePath
+  res.viewLocals[ 'pagePath', 'post', 'form', 'error' ]
+  let protectedKeys = [ 'pagePath' ]
   res.setPost = (post = true) => { res.viewLocals['post'] = post }
   res.setForm = (form = 0) => { res.viewLocals['form'] = form }
   res.setError = str => { res.viewLocals['error'] = str }
-  res.setData = (key, data) => { res.viewLocals[key] = data }
+  res.setData = (key, data) => { if (!protectedKeys.includes(key)) res.viewLocals[key] = data }
+  // Special
+  res.setPath = path => { res.viewLocals['pagePath'] = path }
+  // test
   res.viewLocals['data'] = {}
   res.setdata = (key, data) => { res.viewLocals.data[key] = data }
+
   locale.setPage(page['name'])
   let js = page['js']
 

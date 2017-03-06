@@ -287,6 +287,17 @@ Locale.getToggleSingleDivLink = function(div, name) {
   return pug.render('a(href=\'#\', toggle-single-div=\''+div+'\') '+this.t(name))
 }
 
+Locale.getEditableDiv = function(id, name, content) {
+  return pug.render(`#${id}.editable-div
+#${id}_textdiv.${id}_view.editable-textdiv(onclick='editable_switchToEdit(event)')
+.${id}_edit(style='display: none;')
+  textarea#${id}_textarea_real(name=name, style='display: none')
+    !=content
+  textarea#${id}_textarea.editable-textarea
+  input#${id}_save.editable-button(type='button', value='save', onclick='editable_switchBack(this, true)', editable-id='${id}')
+  input#${id}_cancel.editable-button(type='button', value='cancel', onclick='editable_switchBack(this, false)', editable-id='${id}')`, { name, content })
+}
+
 Locale.getDay = function(day) {
   return this.t('day'+day)
 }

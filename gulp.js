@@ -24,11 +24,22 @@ let env = process.env.NODE_ENV
 
 // CSS
 
+gulp.task('build-corecss', () => {
+  pump([
+    gulp.src(CorePath+'/njb/styl/*.styl'),
+    buffer(),
+    stylus({ use: [autoprefixer('iOS >= 7', 'last 1 Chrome version')]}).on('error', gutil.log),
+    cleanCSS(),
+    rename({ suffix: '.min' }),
+    gulp.dest(DataPath+'/build/css/')
+  ])
+})
+
 gulp.task('build-css', () => {
   pump([
     gulp.src(CorePath+'/site/styl/*.styl'),
     buffer(),
-    stylus({ use: [autoprefixer('iOS >= 7', 'last 1 Chrome version')]}),
+    stylus({ use: [autoprefixer('iOS >= 7', 'last 1 Chrome version')]}).on('error', gutil.log),
     cleanCSS(),
     rename({ suffix: '.min' }),
     gulp.dest(DataPath+'/build/css/')
@@ -70,11 +81,12 @@ gulp.task('build-js', () => {
 
 // Build & Watch
 
-gulp.task('build', ['build-corejs', 'build-js', 'build-css'])
+gulp.task('build', ['build-corejs', 'build-js', 'build-corecss', 'build-css'])
 
 gulp.task('watch', () => {
   gulp.watch(CorePath+'/njb/script/*.js', ['build-corejs'])
   gulp.watch(CorePath+'/site/script/*.js', ['build-js'])
+  gulp.watch(CorePath+'/njb/styl/*.styl', ['build-corecss'])
   gulp.watch(CorePath+'/site/styl/*.styl', ['build-css'])
 })
 

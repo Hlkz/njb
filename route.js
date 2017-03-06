@@ -58,15 +58,15 @@ let LoadRouter = app => {
   app.use('/page/', router)
 
   // Check for non registred pages
-  if (env === 'development')  {
-    let router2 = express.Router()
-    router2.use('/', (req, res, next) => {
-      if (!Process(req, res, true))
-        next()
-    })
-    app.use('/', router2)
-    app.use('/page/', router2)
-  }
+  // if (env === 'development')  {
+  //   let router2 = express.Router()
+  //   router2.use('/', (req, res, next) => {
+  //     if (!Process(req, res, true))
+  //       next()
+  //   })
+  //   app.use('/', router2)
+  //   app.use('/page/', router2)
+  // }
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {

@@ -26,7 +26,7 @@ module.exports = function Render(req, res, page, isContent) {
   if (!isContent || loadfull) {
     let menulinks = require(CorePath+'/site/config/menulinks.json')
     locals.title = title
-    locals.current = page['url'+locale.locale]
+    locals.current = req.url // page['url'+locale.locale]
     locals.menulinks = menulinks
   }
 
