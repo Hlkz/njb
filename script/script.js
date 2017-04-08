@@ -97,20 +97,30 @@ function loadToggleLinks() {
 function loadPageLinks() {
   // Old current span to link
   let currentLinks = document.getElementsByClassName('current-page-link')
-  Array.from(currentLinks).forEach(link=>{
+  Array.from(currentLinks).forEach(link => {
     link.classList.remove('current-page-link')
     changeTag(link, 'a')
   })
   // New current link to span
   let current = getDivAttr('page', 'current')
   let pageLinks = document.getElementsByClassName('page-link')
-  Array.from(pageLinks).forEach(link=>{
+  Array.from(pageLinks).forEach(link => {
     let href = link.getAttribute('href')
     if (href && href === current) {
       link.classList.add('current-page-link')
       changeTag(link, 'label')
     }
   })
+}
+
+function loadSwapLangLinks() {
+  let swapLangUrl = getDivAttr('swap-lang-path', 'path')
+  if (swapLangUrl) {
+    let swapLangLinks = document.getElementsByClassName('swap-lang-link')
+    Array.from(swapLangLinks).forEach(link => {
+      link.href = swapLangUrl
+    })
+  }
 }
 
 $(document).ready(function() {
@@ -196,6 +206,7 @@ function onHiddenPageLoaded(path, html, pushState) {
   document.getElementById('page').innerHTML = document.getElementById('page-hidden').innerHTML
   loadToggleLinks()
   loadPageLinks()
+  loadSwapLangLinks()
   LoadjPlayers()
   loadEditableDiv()
   let title = document.getElementById('page-title').getAttribute('title')

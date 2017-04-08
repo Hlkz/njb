@@ -62,12 +62,16 @@ if (File.exists(gulpAddPath))
 locale.load(true)
 
 // Routes
-import prefix from './prefix'
+import load from './load'
+import router from './router'
 import Catch from './catch'
-import route from './route'
-app.use('/', prefix)
+import Process from './process'
+import routerCatch from './router-catch'
+load(app)
+app.use('/', router)
 Catch(app)
-route(app)
+app.use('/', Process)
+routerCatch(app)
 
 // www
 import www from './www'

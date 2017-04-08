@@ -47,7 +47,7 @@ module.exports = function Render(req, res, page, isContent) {
     if (!isContent && !loadfull) // Only layout
       res.send(html)
     else
-      res.render('page', { title: title, path: locals.pagePath, page: html }, (err, html) => {
+      res.render('page', { title: title, path: locals.pagePath, page: html, swapPath: locale.getSwapLangUrl() }, (err, html) => {
         if (err) return log.error(err)
 
         if (!loadfull)

@@ -1,6 +1,8 @@
 import pug from 'pug'
 import log from './log'
 import db from './database'
+import { CorePath } from './path'
+let config = require(CorePath+'/site/config/config.json')
 
 // // Set lib to var / load it 
 // let db = mysql.createConnection()
@@ -58,6 +60,16 @@ Locale.loadPage = function() {
 
 Locale.locField = function(en, fr) {
   return this.locale === 'en' ? en : fr
+}
+
+Locale.treatConfig = function(config) {
+  if (config) {
+    return {
+      mode: config.mode || 'path',
+      list: config.list || [ 'en', 'fr' ]
+    }
+  } else
+    return null
 }
 
 //
@@ -251,6 +263,9 @@ Locale.getPageLink = function(name, title = null, self = null) {
   let page = this.pages_by_name[name]
   if (page) {
     let pagePath = page['url'+locale]
+    let language = this.treatConfig(config.language)
+    if (language && language.mode === 'path')
+      pagePath = '/' + this.locale + pagePath
     if (!title)
       title = this.t('menu-'+name, self)
     if (!title)
@@ -285,6 +300,29 @@ Locale.getToggleDivLink = function(div, textShow, textHide) {
 
 Locale.getToggleSingleDivLink = function(div, name) {
   return pug.render('a(href=\'#\', toggle-single-div=\''+div+'\') '+this.t(name))
+}
+
+Locale.getSwapLangUrl = function() {
+  let language = this.treatConfig(config.language)
+  let list = language.list
+  if (!language || list.length < 2)
+    return null
+  let host = config.address + (config.clientPort && config.clientPort != 80 ? ':'+config.clientPort : '')
+  let opp = this.locale === list[0] ? list[1] : list[0]
+  let oppPath = this.pages_by_name[this.page]['url'+opp]
+  let oppUrl
+  if (language.mode === 'prefix')
+    oppUrl = 'http://' + (opp === list[0] ? '' : opp+'.') + host + oppPath // + query ?
+  else
+    oppUrl = 'http://' + host + '/' + opp + oppPath // + query ?
+  return oppUrl
+}
+
+Locale.getSwapLangLink = function() {
+  let oppUrl = this.getSwapLangUrl()
+  if (!oppUrl)
+    return ''
+  return pug.render("a.swap-lang-link(href='"+oppUrl+"') " + this.t('swap-lang'))
 }
 
 Locale.getEditableDiv = function(id, name, content) {
@@ -323,5 +361,6 @@ Locale.allowPageContentOnly = true
 //locale.loc = _loc[locale]
 //locale.names // string array
 //Locale.page // string page identifier
+//locale.reqUrl // [ 'http://', '.domain.com' ]
 
 export default Locale

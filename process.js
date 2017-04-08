@@ -5,71 +5,20 @@ import db from './database'
 import common from './common'
 import { CorePath } from './path'
 
-function NewPage(path, js = null) {
-  return {
-    name: path,
-    base: '',
-    path: path,
-    fr: path,
-    en: path,
-    regexfr: '',
-    regexen: '',
-    layout: '',
-    urlfr: '/'+path,
-    urlen: '/'+path,
-    js: js
+export default (req, res, next) => {
+  let page = req.njb_page
+  let isContent = req.njb_isContent
+
+  if (!page) {
+    next()
+    return
   }
-}
-
-export default function Process(req, res, last = null) {
-  // Get page if exists
-  let base = req.baseUrl
-  let isContent = false
-  let pagePath = null
-  let match = null
-  if (match = base.match(/^(\/page)\/{0,1}.*$/)) {
-    isContent = true
-    base = base.substring(match[1].length)
-    pagePath = base
-  }
-
-  const str = decodeURIComponent(req.path.substring(1))
-  let locale = req.locale
-  let loca = locale.locale
-
-  let page = null
-
-  if (!last) { // Look for page in _pages sql table
-    page = req.app.get('pages').find(page => {
-      if (page['base'] === base) {
-        let regexStr = page['regex'+loca]
-        if (regexStr === '') {
-          if (str === page[loca])
-            return true
-        }
-        else {
-          let regex = new RegExp('^'+regexStr+'$')
-          if (regex.exec(str))
-            return true
-        }
-      }
-    })
-  }
-  else { // Last process for non registred pages
-    let jsPath = CorePath+'/site/page/'+str+'.js'
-    let pugPath = CorePath+'/site/page/'+str+'.pug'
-    let js = null
-    if (File.exists(jsPath))
-      js = require(jsPath)
-    if ((js && js.pug) || File.exists(pugPath))
-      page = NewPage(str, js)
-  }
-
-  if (!page)
-    return false
 
   // Page exists => proceed
 
+  let locale = req.locale
+  let loca = req.locale.locale
+  
   // Setting pug variables
   res.viewLocals = {}
   res.viewLocals[ 'pagePath', 'post', 'form', 'error' ]
@@ -128,6 +77,4 @@ export default function Process(req, res, last = null) {
       }, log.error)
     }, log.error)
   }, log.error)
-
-  return true
 }
