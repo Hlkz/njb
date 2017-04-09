@@ -26,7 +26,7 @@ let env = process.env.NODE_ENV
 
 gulp.task('build-corecss', () => {
   pump([
-    gulp.src(CorePath+'/njb/styl/*.styl'),
+    gulp.src(CorePath+'/njb/styl/**/*.styl'),
     buffer(),
     stylus({ use: [autoprefixer('iOS >= 7', 'last 1 Chrome version')]}).on('error', gutil.log),
     cleanCSS(),
@@ -37,7 +37,7 @@ gulp.task('build-corecss', () => {
 
 gulp.task('build-css', () => {
   pump([
-    gulp.src(CorePath+'/site/styl/*.styl'),
+    gulp.src(CorePath+'/site/styl/**/*.styl'),
     buffer(),
     stylus({ use: [autoprefixer('iOS >= 7', 'last 1 Chrome version')]}).on('error', gutil.log),
     cleanCSS(),
@@ -59,7 +59,7 @@ let app_babelrc = {
 
 gulp.task('build-corejs', () => {
   pump([
-    gulp.src(CorePath+'/njb/script/*.js'),
+    gulp.src(CorePath+'/njb/script/**/*.js'),
     babel(script_babelrc).on('error', gutil.log),
     buffer(),
     uglify().on('error', gutil.log),
@@ -70,7 +70,7 @@ gulp.task('build-corejs', () => {
 
 gulp.task('build-js', () => {
   pump([
-    gulp.src(CorePath+'/site/script/*.js'),
+    gulp.src(CorePath+'/site/script/**/*.js'),
     babel(script_babelrc).on('error', gutil.log),
     //buffer(),
     //uglify().on('error', gutil.log),
@@ -84,10 +84,10 @@ gulp.task('build-js', () => {
 gulp.task('build', ['build-corejs', 'build-js', 'build-corecss', 'build-css'])
 
 gulp.task('watch', () => {
-  gulp.watch(CorePath+'/njb/script/*.js', ['build-corejs'])
-  gulp.watch(CorePath+'/site/script/*.js', ['build-js'])
-  gulp.watch(CorePath+'/njb/styl/*.styl', ['build-corecss'])
-  gulp.watch(CorePath+'/site/styl/*.styl', ['build-css'])
+  gulp.watch(CorePath+'/njb/script/**/*.js', ['build-corejs'])
+  gulp.watch(CorePath+'/site/script/**/*.js', ['build-js'])
+  gulp.watch(CorePath+'/njb/styl/**/*.styl', ['build-corecss'])
+  gulp.watch(CorePath+'/site/styl/**/*.styl', ['build-css'])
 })
 
 gulp.start('build')
