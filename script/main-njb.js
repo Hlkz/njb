@@ -25,5 +25,10 @@ head.load([
   'page',
 ].map(e => '/data/build/js/js/' + e + '.min.js'))
 
+// After libs loading
 var njb_headjs_load_script = njb_headjs_load_script
 if (njb_headjs_load_script) njb_headjs_load_script()
+
+// End of document (react apps)
+var njb_headjs_load_script2 = njb_headjs_load_script2
+if (njb_headjs_load_script2) njb_headjs_load_script2()
