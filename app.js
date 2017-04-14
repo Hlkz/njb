@@ -12,6 +12,7 @@ import log from './log'
 import File from './file'
 import command from './command' // load command
 import { CorePath, DataPath, LibPath } from './path'
+import pug from 'pug'
 
 let app = express()
 
@@ -47,6 +48,15 @@ app.use(function(req, res, next) {
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(useragent.express())
+
+// Public Test
+app.use('/', (req, res, next) => {
+  let match = null
+  if (match = req.url.match('/data/test/(.*)\.html$'))
+    pug.renderFile(DataPath+'/test/'+match[1]+'.pug', (err, html) => { if (!err) res.send(html) })
+  else
+    next()
+})
 
 // Public
 app.use('/data', express.static(DataPath))
