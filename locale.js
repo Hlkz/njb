@@ -6,11 +6,10 @@ let config = require(CorePath+'/site/config/config.json')
 
 // // Set lib to var / load it 
 // let db = mysql.createConnection()
-// db.prefix = 'string' // tables prefix_locale_t, prefix_locale_txt, prefix_locale_pug
 // import Locale from './locale'
 // Locale.load(db)
-// // Create instance of lib for each viewer 
-// let locale = req.locale = {}
+// // Create instance of lib for each express request
+// let locale = req.njb_locale = {}
 // Object.setPrototypeOf(locale, Locale)
 // locale.setLocale('fr') // 'fr' or 'en'
 // locale.setNames(['string', 'array'])
@@ -47,13 +46,13 @@ Locale.setNames = function(names) {
 }
 
 Locale.loadPage = function() {
-  return new Promise((resolve, reject) => {
+  return new Promise(s => {
     let loadContent = []
     this.names.forEach(name => {
       loadContent.push(this.loadContent(name))
     })
     Promise.all(loadContent).then(() => {
-      resolve()
+      s()
     }, log.error)
   })
 }
@@ -83,7 +82,7 @@ Locale.isContentLoaded = function(name) {
 }
 
 Locale.loadContent = function(name, force = false) {
-  return new Promise((resolve, reject) => {
+  return new Promise(s => {
     if (!this.isContentLoaded(name) || force) {
       this.resetContent(name)
       Promise.all([
@@ -91,15 +90,17 @@ Locale.loadContent = function(name, force = false) {
         this.loadPage_txt(name)
       ]).then(() => { // _t & _txt can be used compiling _pug
         this.loadPage_pug(name).then(() => {
-          if (!name)
+          if (!name) {
+            log.info('All locales loaded successfully')
             this.fullLoaded = true
+          }
           else if (!this.isContentLoaded(name))
             this.loaded.push(name)
-          resolve()
+          s()
         }, log.error)
-      }, log.error)
+      })
     } else
-      resolve()
+      s()
   })
 }
 
@@ -118,12 +119,12 @@ Locale.resetContent = function(name) {
 }
 
 Locale.loadPage_t = function(name) {
-  return new Promise((resolve, reject) => {
+  return new Promise(s => {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM njb_locale_t'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
       if (err)
-        reject()
+        log.mysql_error(err)
       else {
         rows.forEach(row => {
           let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
@@ -132,19 +133,19 @@ Locale.loadPage_t = function(name) {
           this._t[_page][_name]['fr'] = row['fr']
           this._t[_page][_name]['en'] = row['en']
         })
-        resolve()
+        s()
       }
     }.bind(this))
   })
 }
 
 Locale.loadPage_txt = function(name) {
-  return new Promise((resolve, reject) => {
+  return new Promise(s => {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM njb_locale_txt'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
       if (err)
-        reject()
+        log.mysql_error(err)
       else {
         rows.forEach(row => {
           let _page = row['page'] === '' ? 'default' : row['page'], _name = row['name']
@@ -153,14 +154,14 @@ Locale.loadPage_txt = function(name) {
           this._txt[_page][_name]['fr'] = row['fr']
           this._txt[_page][_name]['en'] = row['en']
         })
-        resolve()
+        s()
       }
     }.bind(this))
   })
 }
 
 Locale.loadPugLocale = function(pattern, container, locale, page) {
-  return new Promise((resolve, reject) => {
+  return new Promise((s, f) => {
     let locals = {
       t: this,
       locale: locale, page: page,
@@ -172,22 +173,21 @@ Locale.loadPugLocale = function(pattern, container, locale, page) {
       if (err) {
         log.error(err)
         container[locale] = null
-        reject()
-      } else {
+        f()
+      } else
         container[locale] = html
-      }
-      resolve()
+      s()
     })
   })
 }
 
 Locale.loadPage_pug = function(name) {
-  return new Promise((resolve, reject) => {
+  return new Promise((s, f) => {
     name = name === 'default' ? '' : name
     let query = 'SELECT page, name, fr, en FROM njb_locale_pug'+(name ? ' WHERE page=\''+name+'\'' : '')
     db.query(query, function(err, rows, fields) {
       if (err)
-        reject()
+        f()
       else {
         var promises = []
         rows.forEach(row => {
@@ -199,7 +199,7 @@ Locale.loadPage_pug = function(name) {
           promises.push(this.loadPugLocale(row['fr'], this._pug[_page][_name], 'fr', _page))
           promises.push(this.loadPugLocale(row['en'], this._pug[_page][_name], 'en', _page))
         })
-        Promise.all(promises).then(resolve, reject)
+        Promise.all(promises).then(s, f)
       }
     }.bind(this))
   })

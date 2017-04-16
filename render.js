@@ -7,7 +7,7 @@ module.exports = function Render(req, res, page, isContent) {
   let dirname = req.app.get('dirname')
 
   let loadfull = !isContent
-  let locale = req.locale
+  let locale = req.njb_locale
   //console.log('finalize')
   
   let js = page['js']

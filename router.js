@@ -1,14 +1,16 @@
-// Treat prefix host url
-// Set language (fr.domain.com/url or domain.com/fr/url)
-// Lookup page for url
-
 import locale from './locale'
 import { CorePath } from './path'
-let config = require(CorePath+'/site/config/config.json')
+const config = require(CorePath+'/site/config/config.json')
+
+// Express middleware for njb
+// set:
+// req.njb_locale // instance of './locale' with request language
+// req.njb_page // pointer to page Object
+// req.njb_isContent // if full page requested or content only
 
 export default (req, res, next) => {
-  let host = req.get('host')
-  let domain = config.address
+  const host = req.get('host')
+  const domain = config.address
   let prefix = ''
   let port = ''
   let url = req.url
@@ -25,19 +27,19 @@ export default (req, res, next) => {
   // console.log('DOMAIN', domain)
   // console.log('PORT', port)
   // console.log('URL', url)
-  let rest = domain + (port?':'+port:'') + url
-  let baseRedirect = 'http://' + domain + (port?':'+port:'')
+  const rest = domain + (port?':'+port:'') + url
+  const baseRedirect = 'http://' + domain + (port?':'+port:'')
 
   //
   // Language
   //
 
-  let language = locale.treatConfig(config.language)
+  const language = locale.treatConfig(config.language)
   let isContent = false
+  let newLocale = req.njb_locale = {}
+  Object.setPrototypeOf(newLocale, locale)
 
   if (language && language.mode === 'prefix') {
-    let newLocale = req.locale = {}
-    Object.setPrototypeOf(newLocale, locale)
     if (language.list.includes(prefix)) {
       newLocale.setLocale(prefix)
     } else if (['', 'www'].includes(prefix)) {
@@ -54,23 +56,11 @@ export default (req, res, next) => {
   }
 
   if (language && language.mode === 'path') {
-    let newLocale = req.locale = {}
-    Object.setPrototypeOf(newLocale, locale)
     if (url === '/')
       newLocale.setLocale(language.list[0])
-    else if (url.length === 3) {
-      let lang, sub = url.substring(0, 3)
-      if (lang = language.list.find(lang => sub === '/'+lang)) {
-        newLocale.setLocale(lang)
-        url = url.substring(3)
-      }
-      else {
-        res.redirect(baseRedirect)
-        return
-      }
-    } else {
+    else {
       let lang, sub = url.substring(0, 4)
-      if (lang = language.list.find(lang => sub === '/'+lang+'/')) {
+      if (lang = language.list.find(lang => sub === '/'+lang + (sub.length > 3 ? '/' : ''))) {
         newLocale.setLocale(lang)
         url = url.substring(3)
       }
@@ -81,14 +71,16 @@ export default (req, res, next) => {
     }
   }
 
+  req.njb_locale = newLocale
+
   //
   // Page router
   //
 
   let page = null
+  const loca = req.njb_locale.locale
 
   const str = decodeURIComponent(url.substring(1))
-  let loca = req.locale.locale
 
   page = req.app.get('pages').find(page => {
     let regexStr = page['regex'+loca]
@@ -117,18 +109,16 @@ export default (req, res, next) => {
   next()
 }
 
-function NewPage(path, js = null) {
-  return {
-    name: path,
-    base: '',
-    path: path,
-    fr: path,
-    en: path,
-    regexfr: '',
-    regexen: '',
-    layout: '',
-    urlfr: '/'+path,
-    urlen: '/'+path,
-    js: js
-  }
-}
+const NewPage = (path, js = null) => ({
+  name: path,
+  base: '',
+  path: path,
+  fr: path,
+  en: path,
+  regexfr: '',
+  regexen: '',
+  layout: '',
+  urlfr: '/'+path,
+  urlen: '/'+path,
+  js: js,
+})

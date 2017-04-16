@@ -16,8 +16,8 @@ export default (req, res, next) => {
 
   // Page exists => proceed
 
-  let locale = req.locale
-  let loca = req.locale.locale
+  let locale = req.njb_locale
+  let loca = req.njb_locale.locale
   
   // Setting pug variables
   res.viewLocals = {}
