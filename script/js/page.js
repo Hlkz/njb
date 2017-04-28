@@ -1,6 +1,7 @@
 
 var NJB_SkipSetPage = false
 var jPlayerPlaylists = jPlayerPlaylists || []
+var njb_reactApps = njb_reactApps || []
 
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -144,6 +145,7 @@ $(document).ready(function() {
     loadToggleLinks()
     LoadjPlayers()
     loadEditableDiv()
+    LoadReactApps()
   })
 })
 
@@ -167,6 +169,7 @@ function onHiddenPageLoaded(path, html, pushState) {
   loadSwapLangLinks()
   LoadjPlayers()
   loadEditableDiv()
+  LoadReactApps()
   let title = document.getElementById('page-title').getAttribute('title')
   document.title = title
   if (pushState) {
@@ -215,4 +218,8 @@ function SubmitForm(form) {
 function LoadjPlayers() {
   if (typeof jPlayerPlaylist !== 'undefined')
     jPlayerPlaylists.forEach(list => { new jPlayerPlaylist(list.cssSelector, list.playlist, list.options) })
+}
+
+function LoadReactApps() {
+  njb_reactApps.forEach(fn => fn())
 }
