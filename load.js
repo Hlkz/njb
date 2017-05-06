@@ -2,7 +2,7 @@ import log from './log'
 import db from './database'
 import File from './file'
 import locale from './locale'
-import { LibPath } from './path'
+import { RunPath } from './path'
 
 let env = process.env.NODE_ENV
 
@@ -15,7 +15,7 @@ export default (app) => {
       pages = rows
       pages.forEach(page => {
         if (page['path'] !== '') {
-          let jsPath = LibPath+'/site/page/'+page['path']+'.js'
+          let jsPath = RunPath+'/core/page/'+page['path']+'.js'
           if (File.exists(jsPath)) {
             let js = require(jsPath)
             page['js'] = js
@@ -31,6 +31,15 @@ export default (app) => {
         pages_by_name[page['name']] = page
       })
       log.info('Server Router ready')
+    }
+  })
+  let menulinks = []
+  app.set('njb_menulinks', menulinks)
+  query = 'SELECT name FROM njb_menulinks'
+  db.query(query, function(err, rows) {
+    if (!err) {
+      rows.forEach(row => menulinks.push(row['name']))
+      app.set('njb_menulinks', menulinks)
     }
   })
 }

@@ -1,8 +1,8 @@
 import mysql from 'mysql'
 import common from './common'
 import log from './log'
-import { CorePath } from './path'
-let config = require(CorePath+'/site/config/config.json')
+import { ConfigPath } from './path'
+let config = require(ConfigPath)
 
 let config_db = config.database
 

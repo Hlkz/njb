@@ -1,9 +1,16 @@
-console.log('Start')
-
 import path from 'path'
-let CorePath = path.join(__dirname, '..', '..', 'core')
-let DataPath = path.join(__dirname, '..', '..', 'data')
-let LibPath = path.join(__dirname, '..')
-let LogPath = path.join(__dirname, '..', '..', 'log')
+import File from './file'
 
-export { CorePath, DataPath, LibPath, LogPath }
+let RunPath = path.join(__dirname, '..')
+
+let RootPath = path.join(__dirname, '..')
+if (!File.exists(path.join(RunPath, 'package.json')))
+  RootPath = path.join(RootPath, '..')
+
+let CorePath = path.join(RootPath, 'core')
+let NjbPath = path.join(RootPath, 'njb')
+let DataPath = path.join(RootPath, 'data')
+let LogPath = path.join(RootPath, 'log')
+let ConfigPath = path.join(RootPath, 'config', 'config.json')
+
+export { RunPath, RootPath, CorePath, NjbPath, DataPath, LogPath, ConfigPath}

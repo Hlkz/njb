@@ -24,14 +24,13 @@ module.exports = function Render(req, res, page, isContent) {
   locals.admin = req.session.admin
 
   if (!isContent || loadfull) {
-    let menulinks = require(CorePath+'/site/config/menulinks.json')
     locals.title = title
     locals.current = req.url // page['url'+locale.locale]
-    locals.menulinks = menulinks
+    locals.menulinks = req.app.get('menulinks')
   }
 
-  let pugFilePage = name => CorePath+'/site/page/'+name+'.pug'
-  let pugFileLayout = name => CorePath+'/site/page/layout/'+name+'.pug'
+  let pugFilePage = name => CorePath+'/page/'+name+'.pug'
+  let pugFileLayout = name => CorePath+'/page/layout/'+name+'.pug'
 
   let view = pugFilePage(page['path'])
   let viewLayout = pugFileLayout('default')

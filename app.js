@@ -11,18 +11,18 @@ import locale from './locale'
 import log from './log'
 import File from './file'
 import command from './command' // load command
-import { CorePath, DataPath, LibPath } from './path'
+import { NjbPath, DataPath, RunPath, ConfigPath } from './path'
 import pug from 'pug'
 
 let app = express()
 
 // config
-let config = require(path.join(CorePath, 'site/config/config.json'))
+let config = require(ConfigPath)
 app.set('config', config)
 
 // view engine setup
 app.set('dirname', __dirname)
-app.set('views', path.join(CorePath, 'njb/pug'))
+app.set('views', path.join(NjbPath, 'pug'))
 app.set('view engine', 'pug')
 
 log.load(app)
@@ -64,7 +64,7 @@ app.use(favicon(path.join(DataPath, 'img/favicon.ico')))
 
 // building and watching files (css, script)
 require('./gulp')
-let gulpAddPath = LibPath+'/site/gulp.js'
+let gulpAddPath = path.join(RunPath, 'core/gulp.js')
 if (File.exists(gulpAddPath))
   require(gulpAddPath)
 

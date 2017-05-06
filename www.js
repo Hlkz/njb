@@ -1,7 +1,7 @@
 var debug = require('debug')('hlkz:server');
 import http from 'http'
-import { CorePath } from './path'
-let config = require(CorePath+'/site/config/config.json')
+import { ConfigPath } from './path'
+let config = require(ConfigPath)
 
 var port = normalizePort(config.port);
 

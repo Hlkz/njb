@@ -1,8 +1,8 @@
 import pug from 'pug'
 import log from './log'
 import db from './database'
-import { CorePath } from './path'
-let config = require(CorePath+'/site/config/config.json')
+import { ConfigPath } from './path'
+let config = require(ConfigPath)
 
 // // Set lib to var / load it 
 // let db = mysql.createConnection()

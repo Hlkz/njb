@@ -1,6 +1,6 @@
 import locale from './locale'
-import { CorePath } from './path'
-const config = require(CorePath+'/site/config/config.json')
+import { CorePath, ConfigPath } from './path'
+let config = require(ConfigPath)
 
 // Express middleware for njb
 // set:
