@@ -78,6 +78,7 @@ export default (req, res, next) => {
   //
 
   let page = null
+  let pageMatch = null
   const loca = req.njb_locale.locale
 
   const str = decodeURIComponent(url.substring(1))
@@ -90,7 +91,8 @@ export default (req, res, next) => {
     }
     else {
       let regex = new RegExp('^'+regexStr+'$')
-      if (regex.exec(str))
+      pageMatch = regex.exec(str)
+      if (pageMatch)
         return true
     }
   })
@@ -104,6 +106,7 @@ export default (req, res, next) => {
   //     page = NewPage(str, js)
   // }
   req.njb_page = page
+  req.njb_page_match = pageMatch
   req.njb_isContent = isContent
 
   next()

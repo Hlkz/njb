@@ -19,6 +19,7 @@ let app = express()
 // config
 let config = require(ConfigPath)
 app.set('config', config)
+app.set('database', database)
 
 // view engine setup
 app.set('dirname', __dirname)
