@@ -3,6 +3,7 @@ var NJB_SkipSetPage = false
 var jPlayerPlaylists = jPlayerPlaylists || []
 var njb_reactReady = false
 var njb_reactApps = njb_reactApps || []
+var njb_readyFn = njb_readyFn || []
 
 function loadImage(url) {
   return new Promise((resolve, reject) => {
@@ -147,6 +148,7 @@ $(document).ready(function() {
     LoadjPlayers()
     loadEditableDiv()
     LoadReactApps()
+    njb_readyFn.forEach(fn => fn())
   })
 })
 
@@ -170,6 +172,7 @@ function onHiddenPageLoaded(path, html, pushState) {
   loadSwapLangLinks()
   LoadjPlayers()
   loadEditableDiv()
+  njb_readyFn.forEach(fn => fn())
   //LoadReactApps()
   let title = document.getElementById('page-title').getAttribute('title')
   document.title = title
