@@ -26,7 +26,7 @@ module.exports = function Render(req, res, page, isContent) {
   if (!isContent || loadfull) {
     locals.title = title
     locals.current = req.url // page['url'+locale.locale]
-    locals.menulinks = req.app.get('menulinks')
+    locals.menulinks = req.app.get('njb_menulinks')
   }
 
   let pugFilePage = name => CorePath+'/page/'+name+'.pug'

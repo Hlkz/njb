@@ -35,7 +35,7 @@ export default (app) => {
   })
   let menulinks = []
   app.set('njb_menulinks', menulinks)
-  query = 'SELECT name FROM njb_menulinks'
+  query = 'SELECT name FROM njb_menulinks ORDER BY id'
   db.query(query, function(err, rows) {
     if (!err) {
       rows.forEach(row => menulinks.push(row['name']))

@@ -2,8 +2,8 @@ import nodemailer from 'nodemailer'
 import log from './log'
 import db from './database'
 import common from './common'
-import { CorePath } from './path'
-let config = require(CorePath+'/site/config/config.json')
+import { CorePath, ConfigPath } from './path'
+let config = require(ConfigPath)
 let config_mail = config.mail
 
 const smtpConfig = {
